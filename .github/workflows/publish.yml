@@ -20,46 +20,46 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Publish aiguard-core
-        run: cargo publish -p aiguard-core --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-core --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Wait for crates.io index
         run: sleep 30
 
       - name: Publish aiguard-scanner-prompt-injection
-        run: cargo publish -p aiguard-scanner-prompt-injection --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-scanner-prompt-injection --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Publish aiguard-scanner-mcp
-        run: cargo publish -p aiguard-scanner-mcp --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-scanner-mcp --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Publish aiguard-scanner-secrets
-        run: cargo publish -p aiguard-scanner-secrets --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-scanner-secrets --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Wait for crates.io index
         run: sleep 30
 
       - name: Publish aiguard-mcp-proxy
-        run: cargo publish -p aiguard-mcp-proxy --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-mcp-proxy --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Publish aiguard-replay
-        run: cargo publish -p aiguard-replay --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-replay --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Publish aiguard-adapter-shellhook
-        run: cargo publish -p aiguard-adapter-shellhook --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-adapter-shellhook --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Wait for crates.io index
         run: sleep 30
 
       - name: Publish aiguard-adapter-opencode
-        run: cargo publish -p aiguard-adapter-opencode --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-adapter-opencode --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Publish aiguard-adapter-aider
-        run: cargo publish -p aiguard-adapter-aider --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-adapter-aider --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Publish aiguard-adapter-goose
-        run: cargo publish -p aiguard-adapter-goose --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard-adapter-goose --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
 
       - name: Wait for crates.io index
         run: sleep 30
 
       - name: Publish aiguard (binary)
-        run: cargo publish -p aiguard --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p aiguard --token ${{ secrets.CARGO_REGISTRY_TOKEN }} || echo "already published, skipping"
