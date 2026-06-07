@@ -7,7 +7,7 @@ license.workspace = true
 description = "Gitleaks-compatible secret detection and redaction"
 
 [dependencies]
-aiguard-core = { path = "../aiguard-core" }
+aiguard-core = { path = "../aiguard-core", version = "0.0.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 toml = { workspace = true }
