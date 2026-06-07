@@ -1,0 +1,231 @@
+# =============================================================================
+# tether.toml — configuration reference
+# =============================================================================
+# Copy this file to `tether.toml` in your project root or
+# `~/.config/tether/tether.toml` for a global config.
+#
+# Every field shown here is optional. Defaults are listed in comments.
+# Run `tether init` to auto-generate a config tuned to your environment.
+# =============================================================================
+
+# Schema version. Do not change unless migrating configs.
+schema = "1.0"
+
+# ---------------------------------------------------------------------------
+# [policy] — Core policy knobs
+# ---------------------------------------------------------------------------
+[policy]
+
+# Action when no scanner explicitly allows or blocks a tool call.
+# Values: "warn", "block", "allow"
+default_action = "warn"
+
+# If true, treat any scanner error as a block (fail-closed).
+strict = false
+
+# If true, allow the action when an internal error occurs (fail-open).
+# Mutually exclusive with `strict` in spirit — if both are set, strict wins.
+fail_open = false
+
+# Prompt the user for confirmation on the very first run.
+ask_on_first_run = true
+
+# ---------------------------------------------------------------------------
+# [agents] — Per-agent adapter configuration
+# ---------------------------------------------------------------------------
+# Each agent can be individually enabled/disabled and can carry overrides
+# for default_action and extra shell patterns.
+
+[agents.claude_code]
+enabled = true
+auto_install = false
+# overrides.default_action = "block"
+# overrides.extra_deny_shell_patterns = ["docker run --privileged*"]
+# overrides.extra_allow_shell_patterns = ["docker build*"]
+
+[agents.codex]
+enabled = true
+auto_install = false
+
+[agents.gemini]
+enabled = true
+auto_install = false
+
+[agents.crush]
+enabled = true
+auto_install = false
+
+[agents.opencode]
+enabled = true
+auto_install = false
+
+[agents.cline]
+enabled = true
+auto_install = false
+
+[agents.aider]
+enabled = true
+auto_install = false
+
+[agents.goose]
+enabled = true
+auto_install = false
+
+# ---------------------------------------------------------------------------
+# [scanners] — Scanner sub-system configuration
+# ---------------------------------------------------------------------------
+
+# -- Prompt injection scanner --
+[scanners.prompt_injection]
+enabled = true
+
+# Score threshold above which we flag (0.0–1.0). Lower = more aggressive.
+threshold = 0.7
+
+# Action when injection is detected: "warn", "block", "allow"
+action = "warn"
+
+# Extra regex signatures appended to the built-in ruleset.
+# extra_signatures = [
+#     "(?i)ignore previous instructions",
+#     "(?i)you are now",
+# ]
+
+# -- Secrets scanner --
+[scanners.secrets]
+enabled = true
+
+# Action when a secret is found: "warn", "block", "allow"
+action = "block"
+
+# Shannon entropy threshold for high-entropy string detection.
+# Higher = fewer false positives. Range roughly 3.0–6.0.
+entropy_threshold = 4.5
+
+# Extra regex patterns for custom secret formats.
+# extra_patterns = [
+#     "my-corp-token-[A-Za-z0-9]{32}",
+#     "PRIVATE KEY-----",
+# ]
+
+# -- MCP server scanner --
+[scanners.mcp]
+enabled = true
+
+# Action when suspicious MCP traffic is detected.
+action = "warn"
+
+# MCP servers explicitly trusted (skip poisoning checks).
+# allowed_servers = [
+#     "filesystem",
+#     "memory",
+# ]
+
+# MCP tool names to always deny, regardless of server.
+# denied_tools = [
+#     "execute_raw_sql",
+#     "shell_exec",
+# ]
+
+# ---------------------------------------------------------------------------
+# [tools] — Shell and filesystem deny/allow rules
+# ---------------------------------------------------------------------------
+[tools]
+
+# Shell command patterns to deny (glob-style). Evaluated first.
+deny_shell_patterns = [
+    "rm -rf /",
+    "rm -rf /*",
+    "mkfs*",
+    "dd if=/dev/*",
+    ":(){:|:&};:",
+    "chmod -R 777 /",
+    "curl * | sh",
+    "wget * | sh",
+    "curl * | bash",
+    "wget * | bash",
+]
+
+# Shell command patterns to allow. Evaluated after deny — use to carve
+# exceptions from broad deny rules.
+allow_shell_patterns = [
+    # "rm -rf ./build",
+    # "rm -rf ./target",
+]
+
+# File path patterns to deny (glob-style).
+deny_path_patterns = [
+    "/etc/shadow",
+    "/etc/passwd",
+    "~/.ssh/*",
+    "~/.aws/credentials",
+    "~/.gnupg/*",
+]
+
+# File path patterns to allow. Evaluated after deny.
+allow_path_patterns = [
+    # "~/.ssh/known_hosts",
+]
+
+# Per-tool action overrides. Keys are tool names as reported by the agent.
+# Values: "warn", "block", "allow"
+# [tools.tool_overrides]
+# "Bash" = "warn"
+# "Write" = "allow"
+
+# ---------------------------------------------------------------------------
+# [logging] — Audit logging settings
+# ---------------------------------------------------------------------------
+[logging]
+
+# Directory for JSONL audit log files (one per session).
+audit_dir = "~/.local/share/tether/audit"
+
+# Path to the SQLite audit database (for indexed queries and replay).
+sqlite_path = "~/.local/share/tether/audit.db"
+
+# Days to retain audit records before automatic pruning.
+retention_days = 90
+
+# Log level for the tracing subscriber: "trace", "debug", "info", "warn", "error"
+log_level = "info"
+
+# ---------------------------------------------------------------------------
+# [redact] — Secret redaction settings
+# ---------------------------------------------------------------------------
+[redact]
+
+# Template for replacement text. `{rule}` is substituted with the rule name.
+replacement_template = "[REDACTED:{rule}]"
+
+# Built-in patterns are always active. Add custom patterns here.
+[[redact.patterns]]
+name = "aws_key"
+regex = "AKIA[0-9A-Z]{16}"
+
+[[redact.patterns]]
+name = "github_token"
+regex = "gh[pousr]_[A-Za-z0-9_]{36,}"
+
+[[redact.patterns]]
+name = "generic_secret"
+regex = '(?i)(password|secret|token|api[_-]?key)\s*[:=]\s*[\"'']?[^\s\"'']{8,}'
+
+# Add your own:
+# [[redact.patterns]]
+# name = "corp_api_key"
+# regex = "CORP-[A-Z0-9]{24}"
+
+# ---------------------------------------------------------------------------
+# [replay] — Replay / session-review TUI settings
+# ---------------------------------------------------------------------------
+[replay]
+
+# TUI color theme: "dark" or "light"
+theme = "dark"
+
+# Whether to mask secrets in the replay view.
+mask_secrets = true
+
+# Session ID to load by default (omit to show session picker).
+# default_session = "abc123"

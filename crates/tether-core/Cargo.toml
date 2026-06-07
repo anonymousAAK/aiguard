@@ -1,0 +1,41 @@
+[package]
+name = "aiguard-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Core policy engine, scanner traits, audit log, and redactor for aiguard"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+figment = { workspace = true }
+ciborium = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+rusqlite = { workspace = true }
+zstd = { workspace = true }
+regex = { workspace = true }
+aho-corasick = { workspace = true }
+directories = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+once_cell = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }
+insta = { workspace = true }
+criterion = { workspace = true, features = ["html_reports"] }
+
+[[bench]]
+name = "engine_bench"
+harness = false

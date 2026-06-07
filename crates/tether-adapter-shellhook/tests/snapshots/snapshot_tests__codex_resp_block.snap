@@ -1,0 +1,8 @@
+---
+source: crates/tether-adapter-shellhook/tests/snapshot_tests.rs
+assertion_line: 163
+expression: "json!({\"body\": json, \"exit_code\": code})"
+---
+body:
+  error: blocked by policy
+exit_code: 2

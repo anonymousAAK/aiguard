@@ -1,0 +1,213 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write   # required for github-attestations
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Test gate — must pass before any binaries are built
+  # ---------------------------------------------------------------------------
+  test:
+    name: cargo test (workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Cache cargo registry + build artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run workspace tests
+        run: cargo test --workspace --locked
+
+  # ---------------------------------------------------------------------------
+  # Build matrix
+  # ---------------------------------------------------------------------------
+  build:
+    name: build ${{ matrix.target }}
+    needs: test
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS — native runners
+          - target: aarch64-apple-darwin
+            runner: macos-14          # M-series, arm64
+            cross: false
+
+          - target: x86_64-apple-darwin
+            runner: macos-13          # Intel
+            cross: false
+
+          # Linux — use cross for hermetic musl builds
+          - target: aarch64-unknown-linux-musl
+            runner: ubuntu-latest
+            cross: true
+
+          - target: x86_64-unknown-linux-musl
+            runner: ubuntu-latest
+            cross: true
+
+          # Linux GNU (glibc) — optional, comment out if musl is sufficient
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+            cross: true
+
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            cross: false              # native runner is already x86_64-linux-gnu
+
+          # Windows
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            cross: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo registry + build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Install cross (if needed)
+        if: matrix.cross == true
+        run: cargo install cross --git https://github.com/cross-rs/cross --locked
+
+      # Add musl target on the native runner for x86_64-unknown-linux-gnu
+      - name: Add musl libc tools (x86_64-unknown-linux-musl, native)
+        if: matrix.target == 'x86_64-unknown-linux-musl' && matrix.cross == false
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y musl-tools
+
+      - name: Build release binary (cross)
+        if: matrix.cross == true
+        run: cross build --release --locked --target ${{ matrix.target }} -p tether-cli
+
+      - name: Build release binary (cargo)
+        if: matrix.cross == false
+        run: cargo build --release --locked --target ${{ matrix.target }} -p tether-cli
+
+      # ---------------------------------------------------------------------------
+      # Package the binary
+      # ---------------------------------------------------------------------------
+      - name: Determine binary name and extension
+        id: binary
+        shell: bash
+        run: |
+          if [[ "${{ matrix.target }}" == *"-windows-"* ]]; then
+            echo "ext=.exe"
+            echo "name=tether.exe"
+          else
+            echo "ext="
+            echo "name=tether"
+          fi >> "$GITHUB_OUTPUT"
+
+      - name: Create release archive (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          TARGET="${{ matrix.target }}"
+          ARCHIVE="tether-${TAG}-${TARGET}.tar.gz"
+          BIN="target/${TARGET}/release/tether"
+
+          tar -czf "$ARCHIVE" -C "$(dirname "$BIN")" "$(basename "$BIN")"
+
+          sha256sum "$ARCHIVE" > "${ARCHIVE}.sha256"
+
+          echo "ARCHIVE=${ARCHIVE}" >> "$GITHUB_ENV"
+          echo "CHECKSUM=${ARCHIVE}.sha256" >> "$GITHUB_ENV"
+
+      - name: Create release archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $tag    = "$env:GITHUB_REF_NAME"
+          $target = "${{ matrix.target }}"
+          $archive = "tether-$tag-$target.zip"
+          $bin    = "target\$target\release\tether.exe"
+
+          Compress-Archive -Path $bin -DestinationPath $archive
+
+          $hash = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLower()
+          "$hash  $archive" | Out-File -FilePath "$archive.sha256" -Encoding ascii
+
+          Add-Content $env:GITHUB_ENV "ARCHIVE=$archive"
+          Add-Content $env:GITHUB_ENV "CHECKSUM=$archive.sha256"
+
+      # ---------------------------------------------------------------------------
+      # Attest build provenance (requires id-token: write)
+      # ---------------------------------------------------------------------------
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            ${{ env.ARCHIVE }}
+
+      # ---------------------------------------------------------------------------
+      # Upload artifacts for the publish job
+      # ---------------------------------------------------------------------------
+      - name: Upload archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: |
+            ${{ env.ARCHIVE }}
+            ${{ env.CHECKSUM }}
+          if-no-files-found: error
+          retention-days: 1
+
+  # ---------------------------------------------------------------------------
+  # Publish — creates the GitHub Release and uploads all assets
+  # ---------------------------------------------------------------------------
+  publish:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist/
+          merge-multiple: true
+
+      - name: List release assets
+        run: ls -lh dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "tether ${{ github.ref_name }}"
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true
+          files: dist/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

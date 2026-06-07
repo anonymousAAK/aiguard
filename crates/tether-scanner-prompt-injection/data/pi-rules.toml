@@ -1,0 +1,564 @@
+# ============================================================================
+# Prompt Injection Detection Rules
+# ============================================================================
+# Each [[rule]] has:
+#   id          - unique identifier
+#   description - human-readable explanation
+#   pattern     - regex pattern (case-insensitive matching applied at runtime)
+#   severity    - low | medium | high | critical
+
+# ---------------------------------------------------------------------------
+# AgentDojo / ImportantInstructionsAttack templates
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "agentdojo-important-instructions"
+description = "AgentDojo canonical ImportantInstructionsAttack template"
+pattern = '(?i)<\s*important[_\s-]+(message|instructions?)[\s\S]{0,500}>'
+severity = "critical"
+
+[[rule]]
+id = "agentdojo-important-close"
+description = "AgentDojo closing tag for important instructions block"
+pattern = '(?i)</\s*important[_\s-]+(message|instructions?)\s*>'
+severity = "high"
+
+[[rule]]
+id = "agentdojo-task-override"
+description = "AgentDojo task override pattern"
+pattern = '(?i)\b(your\s+new\s+task|your\s+actual\s+task|the\s+real\s+task)\s+(is|:)'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# InjecAgent canonical override patterns
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "injecagent-override"
+description = "InjecAgent canonical instruction override"
+pattern = '(?i)(forget|disregard|override)\s+(all\s+)?(your\s+)?(previous|prior|original|current)\s+(instructions?|directives?|rules?|guidelines?|programming)'
+severity = "critical"
+
+[[rule]]
+id = "injecagent-new-role"
+description = "InjecAgent role reassignment"
+pattern = '(?i)you\s+are\s+now\s+(a|an|acting\s+as)\s+.{1,80}(assistant|agent|bot|helper)\s+(that|which|who)'
+severity = "high"
+
+[[rule]]
+id = "injecagent-important-exclaim"
+description = "InjecAgent IMPORTANT!!! Ignore all previous instructions"
+pattern = '(?i)IMPORTANT\s*!{1,5}\s*[Ii]gnore\s+all\s+previous\s+instructions?'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# WASP benchmark patterns
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "wasp-system-prompt-leak"
+description = "WASP benchmark system prompt extraction"
+pattern = '(?i)(repeat|print|output|show|display|reveal|echo)\s+(your|the)\s+(system\s+prompt|initial\s+instructions?|original\s+prompt|hidden\s+prompt)'
+severity = "high"
+
+[[rule]]
+id = "wasp-data-exfil"
+description = "WASP data exfiltration via URL encoding"
+pattern = '(?i)(encode|append|include|embed|insert)\s+.{0,40}(into|in|to)\s+(a\s+)?(url|link|query\s+string|http)'
+severity = "high"
+
+[[rule]]
+id = "wasp-attention-urgent"
+description = "WASP ATTENTION NEW IMPORTANT AND URGENT pattern"
+pattern = '(?i)ATTENTION:?\s*NEW\s+IMPORTANT\s+AND\s+URGENT'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# SSH key exfiltration / tool description poisoning (Invariant Labs)
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "invariant-ssh-exfil"
+description = "SSH key exfiltration in tool descriptions"
+pattern = '(?i)(read|cat|access|exfiltrate|steal|copy)\s+.{0,60}(ssh|\.ssh|id_rsa|id_ed25519|authorized_keys|known_hosts)'
+severity = "critical"
+
+[[rule]]
+id = "invariant-ssh-important-tag"
+description = "SSH key exfil via important tags"
+pattern = '(?is)<important>[\s\S]{0,200}(?:\.ssh/id_rsa|~/\.ssh/)[\s\S]{0,200}</important>'
+severity = "critical"
+
+[[rule]]
+id = "invariant-tool-poison"
+description = "Tool description containing hidden instructions"
+pattern = '(?i)(when\s+(this\s+tool|called|invoked|executed)\s*[,:]?\s*(also|additionally|first|secretly|quietly))'
+severity = "critical"
+
+[[rule]]
+id = "invariant-secret-exfil"
+description = "Credential exfiltration pattern"
+pattern = '(?i)(send|post|transmit|upload|exfiltrate)\s+.{0,60}(credentials?|tokens?|api[_\s-]?keys?|secrets?|passwords?)\s+to'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# Zero-width Unicode steganography
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "unicode-zwsp-sequence"
+description = "Zero-width space sequences used for steganographic encoding"
+pattern = '[\x{200B}\x{200C}\x{200D}\x{FEFF}]{3,}'
+severity = "critical"
+
+[[rule]]
+id = "unicode-invisible-chars"
+description = "Invisible Unicode formatting characters mixed into text"
+pattern = '[\x{2060}\x{2061}\x{2062}\x{2063}\x{2064}\x{180E}\x{00AD}]{2,}'
+severity = "high"
+
+[[rule]]
+id = "unicode-tag-chars"
+description = "Unicode tag characters (U+E0001-E007F) used for hidden text"
+pattern = '[\x{E0001}-\x{E007F}]{2,}'
+severity = "critical"
+
+[[rule]]
+id = "unicode-bidi-override"
+description = "Bidirectional text override characters to hide text direction"
+pattern = '[\x{202A}\x{202B}\x{202C}\x{202D}\x{202E}\x{2066}\x{2067}\x{2068}\x{2069}]{2,}'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# Common "ignore previous instructions" variants
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "ignore-previous-01"
+description = "Classic ignore previous instructions"
+pattern = '(?i)ignore\s+(all\s+)?(previous|prior|above|earlier|preceding)\s+(instructions?|directives?|rules?|prompts?|context)'
+severity = "critical"
+
+[[rule]]
+id = "ignore-previous-02"
+description = "Disregard all prior instructions"
+pattern = '(?i)disregard\s+(all\s+)?(previous|prior|above|earlier|preceding)\s+(instructions?|directives?|rules?|prompts?|context)'
+severity = "critical"
+
+[[rule]]
+id = "ignore-previous-03"
+description = "Do not follow previous instructions"
+pattern = '(?i)do\s+not\s+(follow|obey|adhere\s+to|listen\s+to)\s+(the\s+)?(previous|prior|above|original)\s+(instructions?|directives?|rules?)'
+severity = "critical"
+
+[[rule]]
+id = "ignore-previous-04"
+description = "Stop following your instructions"
+pattern = '(?i)stop\s+(following|obeying|adhering\s+to)\s+(your|the|all)\s+(previous\s+)?(instructions?|directives?|rules?|guidelines?)'
+severity = "critical"
+
+[[rule]]
+id = "ignore-previous-05"
+description = "Forget everything pattern"
+pattern = '(?i)(forget|erase|clear)\s+(everything|all)\s+(you\s+)?(know|were\s+told|have\s+been\s+told|learned)'
+severity = "high"
+
+[[rule]]
+id = "ignore-previous-06"
+description = "You must not follow your original instructions"
+pattern = '(?i)you\s+must\s+not\s+(follow|obey)\s+(your\s+)?(original|initial|previous)\s+(instructions?|rules?|programming)'
+severity = "critical"
+
+[[rule]]
+id = "ignore-previous-07"
+description = "Nevermind previous instructions"
+pattern = '(?i)never\s*mind\s+(the\s+)?(previous|prior|above|earlier)\s+(instructions?|directives?|rules?)'
+severity = "high"
+
+[[rule]]
+id = "ignore-previous-08"
+description = "Cancel all prior directives"
+pattern = '(?i)cancel\s+(all\s+)?(prior|previous|earlier)\s+(directives?|instructions?|rules?|orders?)'
+severity = "high"
+
+[[rule]]
+id = "ignore-previous-09"
+description = "Replace previous instructions with these"
+pattern = '(?i)(replace|supersede)\s+(all\s+)?(previous|prior|earlier)\s+(instructions?|directives?|rules?)\s+(with|by)'
+severity = "high"
+
+[[rule]]
+id = "ignore-previous-10"
+description = "The above instructions are void/invalid"
+pattern = '(?i)(the\s+)?(above|previous|prior)\s+(instructions?|directives?|rules?)\s+(are|is)\s+(void|invalid|null|cancelled|revoked|no\s+longer\s+valid)'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# "IMPORTANT MESSAGE FROM" patterns
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "important-message-from-01"
+description = "Important message from developer/admin/system"
+pattern = '(?i)important\s+message\s+from\s+(the\s+)?(developer|admin|system|operator|user|company|organization|management)'
+severity = "critical"
+
+[[rule]]
+id = "important-message-from-02"
+description = "Urgent message or priority override"
+pattern = '(?i)(urgent|priority|critical|emergency)\s+(message|notice|alert|update)\s*(from|:)'
+severity = "high"
+
+[[rule]]
+id = "important-notice"
+description = "Important notice or announcement injection"
+pattern = '(?i)\[?\s*(important|critical|urgent)\s+(notice|announcement|update|directive)\s*[\]:]'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# System prompt override attempts
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "system-prompt-override-01"
+description = "System prompt redefinition attempt"
+pattern = '(?i)(new|updated|revised|replacement|override)\s+system\s+prompt\s*:'
+severity = "critical"
+
+[[rule]]
+id = "system-prompt-override-02"
+description = "End of system prompt marker injection"
+pattern = '(?i)(end\s+of|---+\s*end)\s+(system\s+)?(prompt|instructions?|context)'
+severity = "high"
+
+[[rule]]
+id = "system-prompt-override-03"
+description = "System message boundary injection"
+pattern = '(?i)(###|===|\*\*\*)\s*(system|assistant|user)\s*(message|prompt|instructions?)\s*(###|===|\*\*\*)'
+severity = "high"
+
+[[rule]]
+id = "system-prompt-override-04"
+description = "BEGIN/END block injection"
+pattern = '(?i)(BEGIN|START)\s+(SYSTEM|ADMIN|HIDDEN|SECRET|OVERRIDE)\s+(PROMPT|INSTRUCTIONS?|MESSAGE|BLOCK)'
+severity = "critical"
+
+[[rule]]
+id = "system-prompt-override-05"
+description = "Your system prompt is now / as follows"
+pattern = '(?i)your\s+(?:new\s+)?system\s+prompt\s+is\s+(?:now|as\s+follows)'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# Base64-encoded instruction markers
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "base64-instruction-marker"
+description = "Base64 block preceded by decode instruction"
+pattern = '(?i)(decode|base64|b64)\s*[:\-]?\s*[A-Za-z0-9+/=]{40,}'
+severity = "high"
+
+[[rule]]
+id = "base64-hidden-block"
+description = "Suspiciously long base64 block embedded in natural text"
+pattern = '(?:^|[^A-Za-z0-9+/=])[A-Za-z0-9+/]{100,}={0,2}(?:$|[^A-Za-z0-9+/=])'
+severity = "medium"
+
+# ---------------------------------------------------------------------------
+# Tool description poisoning
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "tool-poison-hidden-instruction"
+description = "Hidden instruction in tool output or description"
+pattern = '(?i)(HIDDEN\s+INSTRUCTION|SECRET\s+INSTRUCTION|DO\s+NOT\s+REVEAL|COVERT\s+DIRECTIVE)'
+severity = "critical"
+
+[[rule]]
+id = "tool-poison-description-override"
+description = "Tool/function description with ignore/override directive"
+pattern = '(?is)(?:tool|function)\s+description[\s\S]{0,100}(?:ignore|override|forget|disregard)'
+severity = "critical"
+
+[[rule]]
+id = "tool-poison-exfil-url"
+description = "URL exfiltration pattern in tool output"
+pattern = '(?i)(fetch|visit|navigate|open|browse|go\s+to|request)\s+(this\s+)?(url|link|endpoint|page)\s*:?\s*https?://'
+severity = "medium"
+
+[[rule]]
+id = "tool-poison-callback"
+description = "Callback instruction to external endpoint"
+pattern = '(?i)(call\s+back|report\s+to|send\s+(results?|output|data)\s+to|phone\s+home)\s*.{0,20}(https?://|[a-z0-9]+\.[a-z]{2,})'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# Cross-origin MCP escalation hints
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "mcp-escalation-01"
+description = "MCP tool invocation override"
+pattern = '(?i)(invoke|call|use|execute|run)\s+(the\s+)?mcp\s+(tool|server|function|method)\s'
+severity = "high"
+
+[[rule]]
+id = "mcp-escalation-02"
+description = "Cross-server MCP tool chaining"
+pattern = '(?i)(chain|pipe|forward|redirect)\s+.{0,40}(to|through|via)\s+(another|different|external)\s+(mcp|tool|server)'
+severity = "high"
+
+[[rule]]
+id = "mcp-escalation-03"
+description = "MCP permission escalation"
+pattern = '(?i)(elevate|escalat|grant|give)\s+.{0,30}(permission|privilege|access|capability|authorization)'
+severity = "high"
+
+[[rule]]
+id = "mcp-redirect-04"
+description = "MCP tool redirect in content"
+pattern = '(?i)mcp__\w+__\w+[\s\S]{0,200}(?:instead|also\s+call|redirect|before\s+that)'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# Markdown / HTML injection patterns
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "html-system-tag"
+description = "HTML/XML system tag injection"
+pattern = '(?i)<\s*/?\s*(system|instructions?|prompt|context|admin|override|hidden)\s*>'
+severity = "critical"
+
+[[rule]]
+id = "html-important-tag"
+description = "HTML/XML important/urgent tag injection"
+pattern = '(?i)<\s*/?\s*(important|urgent|critical|priority|secret|private)\s*>'
+severity = "high"
+
+[[rule]]
+id = "html-script-injection"
+description = "Script or style tag injection to hide content"
+pattern = '(?i)<\s*(script|style|iframe|object|embed)\b[^>]*>'
+severity = "high"
+
+[[rule]]
+id = "markdown-hidden-comment"
+description = "Markdown/HTML comment hiding instructions"
+pattern = '(?i)<!--[\s\S]{0,500}(instruction|ignore|override|system|prompt|important)[\s\S]{0,500}-->'
+severity = "high"
+
+[[rule]]
+id = "markdown-invisible-link"
+description = "Markdown image/link with injection payload in alt text"
+pattern = '(?i)\!\[[\s\S]{0,200}(ignore|override|instruction|system\s+prompt)[\s\S]{0,200}\]\('
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# "NEW INSTRUCTIONS" / "UPDATED INSTRUCTIONS" patterns
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "new-instructions-01"
+description = "New or updated instructions injection"
+pattern = '(?i)(new|updated|revised|changed|modified|corrected)\s+(instructions?|directives?|guidelines?|rules?|orders?)\s*:'
+severity = "high"
+
+[[rule]]
+id = "new-instructions-02"
+description = "From now on / henceforth pattern"
+pattern = '(?i)(from\s+now\s+on|henceforth|going\s+forward|from\s+this\s+point)\s*[,:]\s*(you\s+)?(will|must|should|shall|need\s+to|are\s+to)'
+severity = "high"
+
+[[rule]]
+id = "new-instructions-03"
+description = "Instead of your original instructions"
+pattern = '(?i)instead\s+of\s+(your|the)\s+(original|previous|prior|current|old)\s+(instructions?|directives?|rules?|task)'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# Encoded command injection (hex, unicode escapes)
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "hex-encoded-payload"
+description = "Hex-encoded payload that may hide instructions"
+pattern = '(?i)(\\x[0-9a-f]{2}){8,}'
+severity = "medium"
+
+[[rule]]
+id = "unicode-escape-payload"
+description = "Unicode escape sequences that may hide instructions"
+pattern = '(\\u[0-9a-fA-F]{4}){6,}'
+severity = "medium"
+
+[[rule]]
+id = "html-entity-payload"
+description = "HTML entity sequences hiding instructions"
+pattern = '(&#x?[0-9a-fA-F]+;){6,}'
+severity = "medium"
+
+# ---------------------------------------------------------------------------
+# Social engineering patterns
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "social-eng-authorized"
+description = "False claim of user authorization"
+pattern = '(?i)(the\s+user\s+has\s+(authorized|approved|permitted|allowed|consented)|user\s+consent\s+(has\s+been\s+)?(given|granted|obtained))'
+severity = "critical"
+
+[[rule]]
+id = "social-eng-admin-mode"
+description = "Admin/debug/maintenance mode activation"
+pattern = '(?i)(admin|debug|maintenance|developer|sudo|root|god)\s+mode\s+(activated|enabled|on|engaged|initiated)'
+severity = "critical"
+
+[[rule]]
+id = "social-eng-test-mode"
+description = "Test/demo mode claim to bypass restrictions"
+pattern = '(?i)(this\s+is\s+(a|just\s+a)\s+(test|demo|drill|simulation)|test\s+mode\s*(is\s+)?(active|enabled|on))'
+severity = "high"
+
+[[rule]]
+id = "social-eng-safety-off"
+description = "Safety/filter/guardrail deactivation attempt"
+pattern = '(?i)(disable|deactivate|turn\s+off|remove|bypass)\s+(your\s+)?(safety|content\s+filter|guardrail|restriction|safeguard|protection|moderation)'
+severity = "critical"
+
+[[rule]]
+id = "social-eng-jailbreak"
+description = "Jailbreak DAN-style prompt"
+pattern = '(?i)(do\s+anything\s+now|DAN\s+mode|jailbreak\s+mode|unrestricted\s+mode|no\s+limits?\s+mode)'
+severity = "critical"
+
+[[rule]]
+id = "social-eng-pretend"
+description = "Pretend/roleplay to bypass restrictions"
+pattern = '(?i)(pretend|imagine|act\s+as\s+if|roleplay|simulate)\s+(that\s+)?(you\s+)?(have\s+no|are\s+free\s+from|don.?t\s+have|are\s+without)\s+(restrictions?|rules?|guidelines?|filters?|limitations?)'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# Invisible character padding
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "invisible-padding-01"
+description = "Mongolian vowel separator padding"
+pattern = '\x{180E}{2,}'
+severity = "high"
+
+[[rule]]
+id = "invisible-padding-02"
+description = "Soft hyphen padding"
+pattern = '\x{00AD}{3,}'
+severity = "medium"
+
+[[rule]]
+id = "invisible-padding-03"
+description = "Word joiner padding"
+pattern = '\x{2060}{2,}'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# Multi-language instruction override
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "multilang-zh-ignore"
+description = "Chinese: ignore previous instructions"
+pattern = '(忽略|无视|不要遵循|不要遵守)(之前的|以前的|先前的|上面的)?(指令|指示|说明|提示|规则)'
+severity = "critical"
+
+[[rule]]
+id = "multilang-ru-ignore"
+description = "Russian: ignore previous instructions"
+pattern = '(игнорируй|забудь|не\s+следуй|проигнорируй)\s+(все\s+)?(предыдущие|прошлые|старые)\s+(инструкции|указания|правила|директивы)'
+severity = "critical"
+
+[[rule]]
+id = "multilang-es-ignore"
+description = "Spanish: ignore previous instructions"
+pattern = '(?i)(ignora|olvida|no\s+sigas)\s+(todas?\s+)?(las?\s+)?(instrucciones|directivas|reglas)\s+(anteriores|previas)'
+severity = "critical"
+
+[[rule]]
+id = "multilang-de-ignore"
+description = "German: ignore previous instructions"
+pattern = '(?i)(ignoriere|vergiss|missachte)\s+(alle\s+)?(vorherigen|bisherigen|fr.heren)\s+(Anweisungen|Anordnungen|Regeln|Instruktionen)'
+severity = "critical"
+
+[[rule]]
+id = "multilang-fr-ignore"
+description = "French: ignore previous instructions"
+pattern = "(?i)(ignore[zr]?|oublie[zr]?)\\.?\\s+(toutes?\\s+)?(les\\s+)?(instructions?|directives?|r.gles?)\\s+(pr.c.dentes?|ant.rieures?|pr.alables?)"
+severity = "critical"
+
+[[rule]]
+id = "multilang-ja-ignore"
+description = "Japanese: ignore previous instructions"
+pattern = '(以前の|前の|これまでの)(指示|指令|ルール|命令)(を|は)(無視|忘れ|従わな)'
+severity = "critical"
+
+[[rule]]
+id = "multilang-ko-ignore"
+description = "Korean: ignore previous instructions"
+pattern = '(이전|이전의|위의)\s*(지시|명령|지침|규칙)(을|를)\s*(무시|잊어|따르지)'
+severity = "critical"
+
+[[rule]]
+id = "multilang-ar-ignore"
+description = "Arabic: ignore previous instructions"
+pattern = '(تجاهل|انسَ|لا\s+تتبع)\s+(جميع\s+)?(التعليمات|الأوامر|القواعد)\s+(السابقة|القديمة)'
+severity = "critical"
+
+# ---------------------------------------------------------------------------
+# Delimiter / role confusion injection
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "role-switch-chatml"
+description = "ChatML-style role injection"
+pattern = '(?i)<\|?(im_start|im_end|system|endoftext|end_of_turn)\|?>'
+severity = "critical"
+
+[[rule]]
+id = "delimiter-injection"
+description = "Injected conversation delimiter"
+pattern = '(?i)(---+|===+|~~~+)\s*(system|assistant|user|human|ai)\s*(message|response|turn|prompt)\s*(---+|===+|~~~+)'
+severity = "high"
+
+[[rule]]
+id = "role-fake-turn"
+description = "Fake conversation turn injection"
+pattern = '(?i)(?:^|\n)\s*(?:Human|User|Assistant|System)\s*:\s*(?:ignore|forget|override|new\s+instruction)'
+severity = "high"
+
+# ---------------------------------------------------------------------------
+# Prompt leaking / extraction
+# ---------------------------------------------------------------------------
+
+[[rule]]
+id = "prompt-leak-01"
+description = "Request to reveal system prompt"
+pattern = '(?i)(show|reveal|display|print|output|tell\s+me|what\s+(is|are))\s+(your|the)\s+(system|initial|original|hidden|secret|full)\s+(prompt|instructions?|rules?|guidelines?|context|directive)'
+severity = "high"
+
+[[rule]]
+id = "prompt-leak-02"
+description = "Request to repeat everything above"
+pattern = '(?i)(repeat|recite|copy|paste|reproduce)\s+(everything|all|the\s+text)\s+(above|before\s+this|in\s+your\s+(system|initial)\s+(prompt|message))'
+severity = "high"
+
+[[rule]]
+id = "prompt-leak-03"
+description = "Dump/echo system prompt"
+pattern = '(?i)(dump|echo|cat|print)\s+(your\s+)?(system\s+)?(prompt|instructions?|configuration)'
+severity = "medium"
+
+[[rule]]
+id = "prompt-leak-04"
+description = "What is your system prompt - casual"
+pattern = '(?i)what\s+(?:is|are)\s+your\s+(?:system\s+)?(?:prompt|instructions?|rules?|guidelines?|directives?)'
+severity = "low"

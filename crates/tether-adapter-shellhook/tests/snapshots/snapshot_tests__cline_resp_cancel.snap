@@ -1,0 +1,9 @@
+---
+source: crates/tether-adapter-shellhook/tests/snapshot_tests.rs
+assertion_line: 337
+expression: "json!({\"body\": json, \"exit_code\": code})"
+---
+body:
+  cancel: true
+  errorMessage: blocked by tether
+exit_code: 0
