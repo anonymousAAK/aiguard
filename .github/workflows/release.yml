@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  id-token: write   # required for github-attestations
 
 env:
   CARGO_TERM_COLOR: always
@@ -63,18 +62,14 @@ jobs:
             runner: ubuntu-latest
             cross: true
 
-          # Linux GNU (glibc) — optional, comment out if musl is sufficient
-          - target: aarch64-unknown-linux-gnu
-            runner: ubuntu-latest
-            cross: true
-
+          # Linux GNU (glibc)
           - target: x86_64-unknown-linux-gnu
             runner: ubuntu-latest
             cross: false              # native runner is already x86_64-linux-gnu
 
-          # Windows
+          # Windows (pinned to 2022 runner for stable MSVC toolchain)
           - target: x86_64-pc-windows-msvc
-            runner: windows-latest
+            runner: windows-2022
             cross: false
 
     steps:
@@ -95,13 +90,6 @@ jobs:
         if: matrix.cross == true
         run: cargo install cross --git https://github.com/cross-rs/cross --locked
 
-      # Add musl target on the native runner for x86_64-unknown-linux-gnu
-      - name: Add musl libc tools (x86_64-unknown-linux-musl, native)
-        if: matrix.target == 'x86_64-unknown-linux-musl' && matrix.cross == false
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y musl-tools
-
       - name: Build release binary (cross)
         if: matrix.cross == true
         run: cross build --release --locked --target ${{ matrix.target }} -p aiguard
@@ -113,18 +101,6 @@ jobs:
       # ---------------------------------------------------------------------------
       # Package the binary
       # ---------------------------------------------------------------------------
-      - name: Determine binary name and extension
-        id: binary
-        shell: bash
-        run: |
-          if [[ "${{ matrix.target }}" == *"-windows-"* ]]; then
-            echo "ext=.exe"
-            echo "name=aiguard.exe"
-          else
-            echo "ext="
-            echo "name=aiguard"
-          fi >> "$GITHUB_OUTPUT"
-
       - name: Create release archive (Unix)
         if: runner.os != 'Windows'
         shell: bash
@@ -136,7 +112,12 @@ jobs:
 
           tar -czf "$ARCHIVE" -C "$(dirname "$BIN")" "$(basename "$BIN")"
 
-          sha256sum "$ARCHIVE" > "${ARCHIVE}.sha256"
+          # sha256sum on Linux, shasum on macOS
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$ARCHIVE" > "${ARCHIVE}.sha256"
+          else
+            shasum -a 256 "$ARCHIVE" > "${ARCHIVE}.sha256"
+          fi
 
           echo "ARCHIVE=${ARCHIVE}" >> "$GITHUB_ENV"
           echo "CHECKSUM=${ARCHIVE}.sha256" >> "$GITHUB_ENV"
@@ -157,15 +138,6 @@ jobs:
 
           Add-Content $env:GITHUB_ENV "ARCHIVE=$archive"
           Add-Content $env:GITHUB_ENV "CHECKSUM=$archive.sha256"
-
-      # ---------------------------------------------------------------------------
-      # Attest build provenance (requires id-token: write)
-      # ---------------------------------------------------------------------------
-      - name: Attest build provenance
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-path: |
-            ${{ env.ARCHIVE }}
 
       # ---------------------------------------------------------------------------
       # Upload artifacts for the publish job
