@@ -25,12 +25,10 @@ static SENSITIVE_PATTERNS: &[&str] = &[
 /// Check a line of output against known sensitive patterns.
 /// Returns the first matching pattern name if found.
 fn check_sensitive(line: &str) -> Option<&'static str> {
-    for pattern in SENSITIVE_PATTERNS {
-        if line.contains(pattern) {
-            return Some(pattern);
-        }
-    }
-    None
+    SENSITIVE_PATTERNS
+        .iter()
+        .find(|p| line.contains(*p))
+        .copied()
 }
 
 /// Run Aider as a monitored subprocess. Forwards stdin/stdout/stderr.
@@ -92,7 +90,10 @@ pub async fn run_aider(args: &[String]) -> Result<i32> {
         }
     }
 
-    let status = child.wait().await.context("Failed to wait for aider process")?;
+    let status = child
+        .wait()
+        .await
+        .context("Failed to wait for aider process")?;
     let code = status.code().unwrap_or(1);
     info!("aider exited with code {}", code);
     Ok(code)

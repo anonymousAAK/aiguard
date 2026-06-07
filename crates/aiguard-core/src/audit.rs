@@ -7,7 +7,7 @@ use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::error::{Result, AiguardError};
+use crate::error::{AiguardError, Result};
 use crate::policy::LoggingConfig;
 
 // ---------------------------------------------------------------------------

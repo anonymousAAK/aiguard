@@ -94,13 +94,13 @@ impl ToolPinner {
         };
 
         // Ensure the pin directory exists
-        fs::create_dir_all(&self.pin_dir).map_err(|e| aiguard_core::AiguardError::Io(e))?;
+        fs::create_dir_all(&self.pin_dir).map_err(aiguard_core::AiguardError::Io)?;
 
         let pin_path = self.pin_path(server_id);
-        let json = serde_json::to_string_pretty(&record)
-            .map_err(|e| aiguard_core::AiguardError::Serde(e))?;
+        let json =
+            serde_json::to_string_pretty(&record).map_err(aiguard_core::AiguardError::Serde)?;
 
-        fs::write(&pin_path, json).map_err(|e| aiguard_core::AiguardError::Io(e))?;
+        fs::write(&pin_path, json).map_err(aiguard_core::AiguardError::Io)?;
 
         Ok(())
     }

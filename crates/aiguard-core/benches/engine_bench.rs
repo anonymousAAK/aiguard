@@ -1,15 +1,16 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use aiguard_core::{PolicyEngine, Policy, PolicyConfig, DefaultAction};
 use aiguard_core::scanner::{AgentKind, ScanContext, Stage};
+use aiguard_core::{DefaultAction, Policy, PolicyConfig, PolicyEngine};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn make_allow_engine() -> PolicyEngine {
-    let mut policy = Policy::default();
-    // Set default_action to Allow so a no-scanner engine always returns Allow.
-    policy.policy = PolicyConfig {
-        default_action: DefaultAction::Allow,
-        strict: false,
-        fail_open: false,
-        ask_on_first_run: false,
+    let policy = Policy {
+        policy: PolicyConfig {
+            default_action: DefaultAction::Allow,
+            strict: false,
+            fail_open: false,
+            ask_on_first_run: false,
+        },
+        ..Policy::default()
     };
     PolicyEngine::noop(policy).expect("failed to build PolicyEngine")
 }

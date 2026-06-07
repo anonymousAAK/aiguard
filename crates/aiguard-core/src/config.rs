@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use figment::providers::{Env, Format, Toml};
 use figment::Figment;
 
-use crate::error::{Result, AiguardError};
+use crate::error::{AiguardError, Result};
 use crate::policy::Policy;
 
 /// Name of the config file to search for.
@@ -46,7 +46,9 @@ pub fn load_policy_from(cwd: Option<PathBuf>) -> Result<Policy> {
     // Layer 3: $AIGUARD_CONFIG env var — validated to .toml extension only.
     if let Ok(env_path) = std::env::var(CONFIG_ENV_VAR) {
         let p = PathBuf::from(&env_path);
-        let ext_ok = p.extension().map_or(false, |e| e.eq_ignore_ascii_case("toml"));
+        let ext_ok = p
+            .extension()
+            .is_some_and(|e| e.eq_ignore_ascii_case("toml"));
         if !ext_ok {
             tracing::warn!(
                 path = %p.display(),

@@ -11,8 +11,8 @@ pub mod audit;
 pub mod pin;
 pub mod proxy;
 
-use async_trait::async_trait;
 use aiguard_core::{Hit, Result, ScanContext, ScanVerdict, Scanner, Stage};
+use async_trait::async_trait;
 
 use crate::audit::ToolDescriptionAuditor;
 use crate::pin::ToolPinner;
@@ -178,8 +178,8 @@ impl Scanner for McpScanner {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::json;
     use aiguard_core::{AgentKind, ScanContext, Stage};
+    use serde_json::json;
 
     #[tokio::test]
     async fn pass_on_clean_tools() {

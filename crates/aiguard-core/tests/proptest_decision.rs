@@ -1,9 +1,14 @@
-use proptest::prelude::*;
+use aiguard_core::scanner::{Hit, ScanVerdict};
 use aiguard_core::{aggregate, Decision};
-use aiguard_core::scanner::{ScanVerdict, Hit};
+use proptest::prelude::*;
 
 fn arb_hit() -> impl Strategy<Value = Hit> {
-    ("[a-z]{1,8}", "[a-z ]{1,20}", 0usize..100usize, 1usize..20usize)
+    (
+        "[a-z]{1,8}",
+        "[a-z ]{1,20}",
+        0usize..100usize,
+        1usize..20usize,
+    )
         .prop_map(|(rule_id, matched_text, offset, length)| Hit {
             rule_id,
             matched_text,
@@ -17,7 +22,11 @@ fn arb_pass() -> impl Strategy<Value = ScanVerdict> {
 }
 
 fn arb_warn() -> impl Strategy<Value = ScanVerdict> {
-    ("[a-z ]{1,30}", 0.0f32..1.0f32, prop::collection::vec(arb_hit(), 0..3))
+    (
+        "[a-z ]{1,30}",
+        0.0f32..1.0f32,
+        prop::collection::vec(arb_hit(), 0..3),
+    )
         .prop_map(|(message, score, hits)| ScanVerdict::Warn {
             message,
             score,
@@ -26,7 +35,11 @@ fn arb_warn() -> impl Strategy<Value = ScanVerdict> {
 }
 
 fn arb_block() -> impl Strategy<Value = ScanVerdict> {
-    ("[a-z ]{1,30}", 0.0f32..1.0f32, prop::collection::vec(arb_hit(), 0..3))
+    (
+        "[a-z ]{1,30}",
+        0.0f32..1.0f32,
+        prop::collection::vec(arb_hit(), 0..3),
+    )
         .prop_map(|(message, score, hits)| ScanVerdict::Block {
             message,
             score,

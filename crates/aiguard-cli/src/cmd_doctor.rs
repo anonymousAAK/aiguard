@@ -250,18 +250,16 @@ fn check_cline_hook() -> CheckStatus {
     };
 
     match hook_path {
-        Some(path) => {
-            match fs::read_to_string(&path) {
-                Ok(content) if content.contains("aiguard") => {
-                    CheckStatus::Ok(format!("configured at {}", path.display()))
-                }
-                Ok(_) => CheckStatus::Warn(format!(
-                    "hook script exists but does not reference aiguard: {}",
-                    path.display()
-                )),
-                Err(e) => CheckStatus::Fail(format!("cannot read {}: {e}", path.display())),
+        Some(path) => match fs::read_to_string(&path) {
+            Ok(content) if content.contains("aiguard") => {
+                CheckStatus::Ok(format!("configured at {}", path.display()))
             }
-        }
+            Ok(_) => CheckStatus::Warn(format!(
+                "hook script exists but does not reference aiguard: {}",
+                path.display()
+            )),
+            Err(e) => CheckStatus::Fail(format!("cannot read {}: {e}", path.display())),
+        },
         None => {
             let cline_installed = which::which("cline").is_ok()
                 || home_dir()

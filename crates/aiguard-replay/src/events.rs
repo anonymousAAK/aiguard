@@ -3,9 +3,9 @@
 //! Loads audit events from aiguard-core's AuditLog database and supports
 //! filtering by session and decision type.
 
+use aiguard_core::AuditEvent;
 use anyhow::{Context, Result};
 use rusqlite::{params, Connection};
-use aiguard_core::AuditEvent;
 
 /// Load all events for a given session from the SQLite database.
 pub fn load_events(db_path: &str, session_id: &str) -> Result<Vec<AuditEvent>> {

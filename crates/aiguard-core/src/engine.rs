@@ -7,7 +7,7 @@ use tracing::{debug, info, warn};
 
 use crate::audit::{AuditEvent, AuditLog};
 use crate::decision::{self, Decision};
-use crate::error::{Result, AiguardError};
+use crate::error::{AiguardError, Result};
 use crate::policy::Policy;
 use crate::redact::Redactor;
 use crate::scanner::{ScanContext, ScanVerdict, Scanner};
@@ -216,8 +216,9 @@ impl PolicyEngine {
 
         // Build the payload from the tool input, redacting secrets.
         // Serialization failures here are non-fatal: we log and continue with empty payload.
-        let payload = ctx.tool_input.map(|input| {
-            match serde_json::to_string(input) {
+        let payload = ctx
+            .tool_input
+            .map(|input| match serde_json::to_string(input) {
                 Ok(raw) => {
                     let (redacted, _) = self.redactor.redact(&raw);
                     redacted.into_bytes()
@@ -226,8 +227,7 @@ impl PolicyEngine {
                     tracing::warn!(error = %e, "failed to serialize tool_input for audit payload");
                     Vec::new()
                 }
-            }
-        });
+            });
 
         let input_bytes = ctx
             .tool_input

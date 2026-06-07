@@ -1,7 +1,7 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::error::{Result, AiguardError};
+use crate::error::{AiguardError, Result};
 use crate::policy::RedactConfig;
 
 /// A single redaction match found in the input text.
@@ -37,7 +37,7 @@ impl Redactor {
     pub fn from_config(config: &RedactConfig) -> Result<Self> {
         let mut rules = Vec::with_capacity(config.patterns.len());
         for pat in &config.patterns {
-            let regex = Regex::new(&pat.regex).map_err(|e| AiguardError::Regex(e))?;
+            let regex = Regex::new(&pat.regex).map_err(AiguardError::Regex)?;
             rules.push(CompiledRule {
                 name: pat.name.clone(),
                 regex,

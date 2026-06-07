@@ -120,7 +120,9 @@ fn decision_to_response(
                  Interactive approval will be added in a future release."
             );
             HookResponse::Block {
-                message: "policy requires manual approval (blocking until interactive mode is available)".to_string(),
+                message:
+                    "policy requires manual approval (blocking until interactive mode is available)"
+                        .to_string(),
             }
         }
     }

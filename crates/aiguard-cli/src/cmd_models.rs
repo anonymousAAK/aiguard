@@ -13,8 +13,12 @@ pub async fn run_pull(model: &str) -> Result<()> {
     };
 
     let models_dir = models_dir()?;
-    std::fs::create_dir_all(&models_dir)
-        .with_context(|| format!("Failed to create models directory: {}", models_dir.display()))?;
+    std::fs::create_dir_all(&models_dir).with_context(|| {
+        format!(
+            "Failed to create models directory: {}",
+            models_dir.display()
+        )
+    })?;
     let dest = models_dir.join(filename);
 
     if dest.exists() {
@@ -80,7 +84,10 @@ async fn download_with_progress(url: &str, dest: &PathBuf) -> Result<()> {
                     match total_bytes {
                         Some(total) => {
                             let total_display = total / (1024 * 1024);
-                            println!("Downloaded {} MB / {} MB", downloaded_display, total_display);
+                            println!(
+                                "Downloaded {} MB / {} MB",
+                                downloaded_display, total_display
+                            );
                         }
                         None => {
                             println!("Downloaded {} MB", downloaded_display);

@@ -1,9 +1,9 @@
 use aho_corasick::AhoCorasick;
+use aiguard_core::{Hit, ScanVerdict};
 use base64::Engine;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::Deserialize;
-use aiguard_core::{Hit, ScanVerdict};
 
 // ---------------------------------------------------------------------------
 // Rule definitions

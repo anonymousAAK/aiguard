@@ -230,4 +230,3 @@ fn cmd_export(db_path: &str, output: Option<String>, session: Option<String>) ->
 
     Ok(())
 }
-

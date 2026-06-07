@@ -1,5 +1,5 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use aiguard_scanner_prompt_injection::RegexTierScanner;
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn make_scanner() -> RegexTierScanner {
     RegexTierScanner::new().expect("failed to build RegexTierScanner")

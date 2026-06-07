@@ -1,8 +1,8 @@
 pub mod entropy;
 pub mod rules;
 
-use async_trait::async_trait;
 use aiguard_core::{Hit, ScanContext, ScanVerdict, Scanner};
+use async_trait::async_trait;
 
 use crate::entropy::shannon_entropy;
 use crate::rules::{load_rules_from_str, CompiledRuleSet};

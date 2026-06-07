@@ -13,7 +13,7 @@ pub use audit::{AuditEvent, AuditLog};
 pub use config::{load_policy, load_policy_from, locate_config};
 pub use decision::{aggregate, Decision};
 pub use engine::PolicyEngine;
-pub use error::{Result, AiguardError};
+pub use error::{AiguardError, Result};
 pub use policy::*;
 pub use redact::{RedactMatch, Redactor};
 pub use scanner::*;
