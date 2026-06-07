@@ -7,8 +7,8 @@ license.workspace = true
 description = "Goose adapter via MCP proxy"
 
 [dependencies]
-aiguard-core = { path = "../aiguard-core", version = "0.0.0" }
-aiguard-mcp-proxy = { path = "../aiguard-mcp-proxy", version = "0.0.0" }
+aiguard-core = { path = "../aiguard-core", version = "0.1.0" }
+aiguard-mcp-proxy = { path = "../aiguard-mcp-proxy", version = "0.1.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = { workspace = true }

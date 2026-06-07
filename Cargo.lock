@@ -31,7 +31,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-adapter-aider",
  "aiguard-adapter-shellhook",
@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-adapter-aider"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "aiguard-mcp-proxy",
@@ -77,7 +77,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-adapter-goose"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "aiguard-mcp-proxy",
@@ -91,7 +91,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-adapter-opencode"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "anyhow",
@@ -102,7 +102,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-adapter-shellhook"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "anyhow",
@@ -118,7 +118,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-core"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aho-corasick",
  "anyhow",
@@ -149,7 +149,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-mcp-proxy"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "anyhow",
@@ -164,7 +164,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-replay"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "anyhow",
@@ -179,7 +179,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-scanner-mcp"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aiguard-core",
  "anyhow",
@@ -200,7 +200,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-scanner-prompt-injection"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aho-corasick",
  "aiguard-core",
@@ -220,7 +220,7 @@ dependencies = [
 
 [[package]]
 name = "aiguard-scanner-secrets"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "aho-corasick",
  "aiguard-core",

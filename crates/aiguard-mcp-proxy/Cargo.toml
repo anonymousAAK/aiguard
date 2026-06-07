@@ -7,7 +7,7 @@ license.workspace = true
 description = "MCP stdio/HTTP proxy for agents without lifecycle hooks"
 
 [dependencies]
-aiguard-core = { path = "../aiguard-core", version = "0.0.0" }
+aiguard-core = { path = "../aiguard-core", version = "0.1.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = { workspace = true }

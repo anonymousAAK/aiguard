@@ -7,7 +7,7 @@ license.workspace = true
 description = "Ratatui-based session replay TUI"
 
 [dependencies]
-aiguard-core = { path = "../aiguard-core", version = "0.0.0" }
+aiguard-core = { path = "../aiguard-core", version = "0.1.0" }
 ratatui = { workspace = true }
 crossterm = { workspace = true }
 serde = { workspace = true }
