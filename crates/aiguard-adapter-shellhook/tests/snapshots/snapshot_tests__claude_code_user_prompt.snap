@@ -1,0 +1,7 @@
+---
+source: crates/aiguard-adapter-shellhook/tests/snapshot_tests.rs
+assertion_line: 75
+expression: "json!({\n    \"session_id\": event.session_id, \"event_type\":\n    format!(\"{:?}\", event.event_type),\n})"
+---
+event_type: UserPromptSubmit
+session_id: sess-abc

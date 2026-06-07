@@ -1,0 +1,8 @@
+---
+source: crates/aiguard-adapter-shellhook/tests/snapshot_tests.rs
+assertion_line: 240
+expression: "json!({\n    \"session_id\": event.session_id, \"event_type\":\n    format!(\"{:?}\", event.event_type), \"tool_name\": event.tool_name,\n})"
+---
+event_type: PreToolUse
+session_id: crush-sess
+tool_name: bash

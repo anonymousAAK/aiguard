@@ -18,4 +18,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Goose config registration
 - Session replay TUI (ratatui)
 - Dual-write audit log (SQLite + JSONL)
-- Example config (`tether.toml.example`)
+- Example config (`aiguard.toml.example`)

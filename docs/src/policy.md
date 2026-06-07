@@ -1,6 +1,6 @@
 # Policy
 
-The `[policy]` section of `tether.toml` controls how tether responds when a scanner returns a verdict. This page documents every field, the deny/allow rule system for tools, and the decision precedence model.
+The `[policy]` section of `aiguard.toml` controls how aiguard responds when a scanner returns a verdict. This page documents every field, the deny/allow rule system for tools, and the decision precedence model.
 
 ## [policy] fields
 
@@ -17,11 +17,11 @@ ask_on_first_run = true
 **Type:** string — `"warn"` | `"block"` | `"allow"`
 **Default:** `"warn"`
 
-The action tether takes when no scanner explicitly blocks or allows a tool call. In other words, this is the fallback verdict when all scanners return `Pass`.
+The action aiguard takes when no scanner explicitly blocks or allows a tool call. In other words, this is the fallback verdict when all scanners return `Pass`.
 
 - `"allow"` — tool call proceeds silently.
 - `"warn"` — tool call proceeds, but the event is logged with a warning.
-- `"block"` — tool call is blocked. Use this only if you want tether to be maximally restrictive and you have explicit allow rules for everything your agents legitimately need to do.
+- `"block"` — tool call is blocked. Use this only if you want aiguard to be maximally restrictive and you have explicit allow rules for everything your agents legitimately need to do.
 
 ### `strict`
 
@@ -35,7 +35,7 @@ When `strict = true`, any scanner `Warn` verdict is escalated to `Block`. This i
 **Type:** bool
 **Default:** `false`
 
-When `fail_open = true`, if tether itself encounters an internal error (a scanner panics, the config file is unreadable, the audit database is locked), it allows the tool call to proceed rather than blocking it. This trades security for availability.
+When `fail_open = true`, if aiguard itself encounters an internal error (a scanner panics, the config file is unreadable, the audit database is locked), it allows the tool call to proceed rather than blocking it. This trades security for availability.
 
 If both `strict = true` and `fail_open = true` are set, `strict` takes precedence.
 
@@ -44,7 +44,7 @@ If both `strict = true` and `fail_open = true` are set, `strict` takes precedenc
 **Type:** bool
 **Default:** `true`
 
-On the very first run in a new project directory, tether prompts you to confirm the active policy before it starts intercepting tool calls. Set to `false` to skip this prompt in non-interactive environments.
+On the very first run in a new project directory, aiguard prompts you to confirm the active policy before it starts intercepting tool calls. Set to `false` to skip this prompt in non-interactive environments.
 
 ## [tools] — Shell and path deny/allow rules
 
@@ -83,7 +83,7 @@ allow_path_patterns = [
 
 ### `deny_shell_patterns`
 
-A list of glob-style patterns matched against the full shell command string. If a command matches any pattern in this list, tether blocks it immediately — before any scanner runs.
+A list of glob-style patterns matched against the full shell command string. If a command matches any pattern in this list, aiguard blocks it immediately — before any scanner runs.
 
 Patterns use `*` as a wildcard (matches any sequence of characters, including spaces). They are matched case-sensitively. The match is applied to the full command string as passed to the agent's shell tool.
 
@@ -154,4 +154,4 @@ extra_allow_shell_patterns = ["docker build*"]
 skip_matchers = ["Read", "Glob", "Grep"]
 ```
 
-`skip_matchers` lists tool names that tether does not intercept for this agent, which reduces latency for read-only tools you trust unconditionally.
+`skip_matchers` lists tool names that aiguard does not intercept for this agent, which reduces latency for read-only tools you trust unconditionally.

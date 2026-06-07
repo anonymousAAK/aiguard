@@ -1,0 +1,24 @@
+[package]
+name = "aiguard-scanner-secrets"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Gitleaks-compatible secret detection and redaction"
+
+[dependencies]
+aiguard-core = { path = "../aiguard-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+regex = { workspace = true }
+aho-corasick = { workspace = true }
+once_cell = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+tokio = { workspace = true }

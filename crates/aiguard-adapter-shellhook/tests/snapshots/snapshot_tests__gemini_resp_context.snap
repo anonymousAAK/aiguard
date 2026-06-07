@@ -1,0 +1,10 @@
+---
+source: crates/aiguard-adapter-shellhook/tests/snapshot_tests.rs
+assertion_line: 224
+expression: "json!({\"body\": json, \"exit_code\": code})"
+---
+body:
+  decision: approve
+  hookSpecificOutput:
+    additionalContext: scanned clean
+exit_code: 0

@@ -1,8 +1,0 @@
----
-source: crates/tether-adapter-shellhook/tests/snapshot_tests.rs
-assertion_line: 195
-expression: "json!({\n    \"session_id\": event.session_id, \"event_type\":\n    format!(\"{:?}\", event.event_type), \"tool_name\": event.tool_name,\n})"
----
-event_type: PostToolUse
-session_id: gem-sess
-tool_name: read_file

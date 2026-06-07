@@ -1,6 +1,6 @@
 # Claude Code
 
-Claude Code is the primary target for tether's shell-hook adapter. It has the most complete hook support of any agent: `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, and `SessionStart` all fire reliably, and `updatedToolOutput` on `PostToolUse` is supported for all tool types (since v2.1.121).
+Claude Code is the primary target for aiguard's shell-hook adapter. It has the most complete hook support of any agent: `PreToolUse`, `PostToolUse`, `UserPromptSubmit`, and `SessionStart` all fire reliably, and `updatedToolOutput` on `PostToolUse` is supported for all tool types (since v2.1.121).
 
 ## Hook type
 
@@ -10,7 +10,7 @@ Hook config file: `~/.claude/settings.json`
 
 ## Install
 
-`tether init` writes the following hooks automatically:
+`aiguard init` writes the following hooks automatically:
 
 ```json
 {
@@ -18,32 +18,32 @@ Hook config file: `~/.claude/settings.json`
     "PreToolUse": [
       {
         "matcher": "*",
-        "hooks": [{ "type": "command", "command": "tether hook claude-code pre" }]
+        "hooks": [{ "type": "command", "command": "aiguard hook claude-code pre" }]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "*",
-        "hooks": [{ "type": "command", "command": "tether hook claude-code post" }]
+        "hooks": [{ "type": "command", "command": "aiguard hook claude-code post" }]
       }
     ],
     "SessionStart": [
       {
-        "hooks": [{ "type": "command", "command": "tether hook claude-code session-start" }]
+        "hooks": [{ "type": "command", "command": "aiguard hook claude-code session-start" }]
       }
     ],
     "UserPromptSubmit": [
       {
-        "hooks": [{ "type": "command", "command": "tether hook claude-code prompt" }]
+        "hooks": [{ "type": "command", "command": "aiguard hook claude-code prompt" }]
       }
     ]
   }
 }
 ```
 
-To install manually without running `tether init`, merge the above into your existing `~/.claude/settings.json`.
+To install manually without running `aiguard init`, merge the above into your existing `~/.claude/settings.json`.
 
-## tether.toml entry
+## aiguard.toml entry
 
 ```toml
 [agents.claude_code]
@@ -57,7 +57,7 @@ skip_matchers = ["Read", "Glob", "Grep"]
 extra_deny_shell_patterns = ["git push --force*"]
 ```
 
-`skip_matchers` lists tool names that tether skips entirely for this agent. Useful for high-frequency read-only tools where the latency overhead is not desired.
+`skip_matchers` lists tool names that aiguard skips entirely for this agent. Useful for high-frequency read-only tools where the latency overhead is not desired.
 
 ## Tool names
 

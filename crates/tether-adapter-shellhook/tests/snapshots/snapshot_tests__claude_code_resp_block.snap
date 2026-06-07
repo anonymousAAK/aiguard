@@ -1,8 +1,0 @@
----
-source: crates/tether-adapter-shellhook/tests/snapshot_tests.rs
-assertion_line: 103
-expression: "json!({\"body\": json, \"exit_code\": code})"
----
-body:
-  error: "denied by tether: rm -rf / matched deny rule"
-exit_code: 2

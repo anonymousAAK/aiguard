@@ -1,6 +1,6 @@
 # Scanners
 
-tether ships three built-in scanners. Each runs as a stage in the tool-call pipeline and returns one of four verdicts: `Pass`, `Warn`, `Mutate`, or `Block`. Verdicts are aggregated with the precedence rule `Block > Mutate > Warn > Pass`.
+aiguard ships three built-in scanners. Each runs as a stage in the tool-call pipeline and returns one of four verdicts: `Pass`, `Warn`, `Mutate`, or `Block`. Verdicts are aggregated with the precedence rule `Block > Mutate > Warn > Pass`.
 
 ## Prompt injection scanner
 
@@ -44,7 +44,7 @@ extra_signatures = [
 ```toml
 [scanners.prompt_injection]
 tier_model = true
-model_path = "~/.local/share/tether/models/pi-v2.onnx"
+model_path = "~/.local/share/aiguard/models/pi-v2.onnx"
 threshold = 0.85
 ```
 
@@ -53,7 +53,7 @@ Downloads and runs the ProtectAI `deberta-v3-base-prompt-injection-v2` model loc
 Download the model with:
 
 ```sh
-tether models pull pi-detector
+aiguard models pull pi-detector
 ```
 
 The model is ~440 MB and runs on CPU. Inference takes 30–80 ms per 512-token chunk. Tool responses longer than 512 tokens are split into overlapping windows; the maximum score across windows is used.
@@ -73,7 +73,7 @@ Sends the tool output to a small LLM with a structured judge prompt. Catches adv
 
 ### Combined effectiveness
 
-Per Debenedetti et al. (NeurIPS 2024, arXiv:2406.13352v3): when deploying a secondary attack detector such as the ProtectAI DeBERTa model, the attack success rate in AgentDojo drops to approximately **8%**. tether targets this floor as its baseline. Tier 3 (LLM judge) can reduce residual risk further but introduces latency and API cost.
+Per Debenedetti et al. (NeurIPS 2024, arXiv:2406.13352v3): when deploying a secondary attack detector such as the ProtectAI DeBERTa model, the attack success rate in AgentDojo drops to approximately **8%**. aiguard targets this floor as its baseline. Tier 3 (LLM judge) can reduce residual risk further but introduces latency and API cost.
 
 ---
 
@@ -134,7 +134,7 @@ name = "corp_api_key"
 regex = "CORP-[A-Z0-9]{24}"
 
 [scanners.secrets]
-extra_patterns = ["~/.config/tether/secrets-extra.toml"]
+extra_patterns = ["~/.config/aiguard/secrets-extra.toml"]
 ```
 
 ---
@@ -153,11 +153,11 @@ The MCP scanner has two phases: static audit at server-load time and runtime gua
 
 ### Static audit
 
-When a new MCP server is added (`tether mcp add <server>` or detected via `tether init`), tether:
+When a new MCP server is added (`aiguard mcp add <server>` or detected via `aiguard init`), aiguard:
 
 1. Fetches the server's `tools/list` response.
 2. Scans every tool name, description, and parameter schema against the Tier-1 regex ruleset for poisoning patterns.
-3. Computes a SHA-256 of the `tools/list` response and stores it as a pin under `~/.local/share/tether/mcp-pins/`.
+3. Computes a SHA-256 of the `tools/list` response and stores it as a pin under `~/.local/share/aiguard/mcp-pins/`.
 4. Flags any remote server that responds to `tools/call` without authentication.
 
 ### Runtime guardrails
@@ -165,8 +165,8 @@ When a new MCP server is added (`tether mcp add <server>` or detected via `tethe
 During an active session:
 
 - All `mcp__<server>__<tool>` calls are subject to the same `[tools.deny]` rules as shell commands.
-- On each session start, tether re-hashes `tools/list` and refuses to load the server if the hash differs from the stored pin (rug-pull defense).
-- Cross-origin escalation: if a tool description from `mcp_A` references `mcp_B`, tether emits a warning.
+- On each session start, aiguard re-hashes `tools/list` and refuses to load the server if the hash differs from the stored pin (rug-pull defense).
+- Cross-origin escalation: if a tool description from `mcp_A` references `mcp_B`, aiguard emits a warning.
 
 ### `denied_tools`
 

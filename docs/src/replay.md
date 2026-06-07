@@ -1,24 +1,24 @@
 # Replay
 
-`tether replay` opens a terminal UI for reviewing any recorded session. Every tool call, scanner verdict, and timing measurement from the audit log is navigable in a three-pane layout.
+`aiguard replay` opens a terminal UI for reviewing any recorded session. Every tool call, scanner verdict, and timing measurement from the audit log is navigable in a three-pane layout.
 
 ## Opening a session
 
 ```sh
 # Open the most recent session
-tether replay --last
+aiguard replay --last
 
 # Open a specific session by ID
-tether replay abc123def456
+aiguard replay abc123def456
 
 # Open the session picker (lists all recorded sessions)
-tether replay
+aiguard replay
 ```
 
 ## TUI layout
 
 ```
-+-------------- tether replay * session abc123 * 2026-05-23 14:02 --------------+
++-------------- aiguard replay * session abc123 * 2026-05-23 14:02 -------------+
 | Timeline (j/k)                  | Event detail (</=)              | Verdict   |
 +----------------------------------+---------------------------------+-----------+
 | 14:02:01 SessionStart            | tool: Bash                      | ALLOW     |
@@ -77,34 +77,34 @@ The final aggregated verdict for the selected event, plus the `default_action` t
 Export an entire session as JSONL:
 
 ```sh
-tether replay --last --export > session.jsonl
+aiguard replay --last --export > session.jsonl
 ```
 
 Export a single event by ID:
 
 ```sh
-tether replay --event abc123def456-0042 --export
+aiguard replay --event abc123def456-0042 --export
 ```
 
 The JSONL format matches the audit log schema, so you can pipe it into `jq` or any JSONL-aware tool:
 
 ```sh
-tether replay --last --export | jq 'select(.decision == "block")'
+aiguard replay --last --export | jq 'select(.decision == "block")'
 ```
 
 ## Audit log location
 
 By default, audit data is stored at:
 
-- JSONL: `~/.local/share/tether/audit/YYYY-MM-DD.jsonl`
-- SQLite: `~/.local/share/tether/tether.db`
+- JSONL: `~/.local/share/aiguard/audit/YYYY-MM-DD.jsonl`
+- SQLite: `~/.local/share/aiguard/aiguard.db`
 
-You can change these paths in `tether.toml`:
+You can change these paths in `aiguard.toml`:
 
 ```toml
 [logging]
-audit_dir = "~/.local/share/tether/audit"
-sqlite_path = "~/.local/share/tether/tether.db"
+audit_dir = "~/.local/share/aiguard/audit"
+sqlite_path = "~/.local/share/aiguard/aiguard.db"
 retention_days = 90
 ```
 

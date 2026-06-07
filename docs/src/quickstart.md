@@ -1,20 +1,20 @@
 # Quick Start
 
-This page gets you from a fresh install to a fully wired tether setup in under five minutes.
+This page gets you from a fresh install to a fully wired aiguard setup in under five minutes.
 
 ## Step 1: Initialize
 
-Run `tether init` from your project directory (or your home directory for a global config):
+Run `aiguard init` from your project directory (or your home directory for a global config):
 
 ```sh
-tether init
+aiguard init
 ```
 
-`tether init` does the following:
+`aiguard init` does the following:
 
 1. Detects which agents are installed on your machine (Claude Code, Codex, Gemini CLI, Crush, Cline, opencode, Aider, Goose).
-2. Writes hook configuration for each detected agent — creating or updating the agent's settings file with `tether hook <agent> pre` and `tether hook <agent> post` commands.
-3. Writes a starter `tether.toml` in the current directory (or `~/.config/tether/tether.toml` if run from `$HOME`) with sensible defaults.
+2. Writes hook configuration for each detected agent — creating or updating the agent's settings file with `aiguard hook <agent> pre` and `aiguard hook <agent> post` commands.
+3. Writes a starter `aiguard.toml` in the current directory (or `~/.config/aiguard/aiguard.toml` if run from `$HOME`) with sensible defaults.
 4. Backs up any existing hook config files before modifying them (saved as `<file>.bak.<timestamp>`).
 
 If you want to generate the config without writing any hook files, pass `--dry-run` to preview what would change.
@@ -22,54 +22,54 @@ If you want to generate the config without writing any hook files, pass `--dry-r
 ## Step 2: Verify
 
 ```sh
-tether doctor
+aiguard doctor
 ```
 
-`tether doctor` checks:
+`aiguard doctor` checks:
 
-- The tether binary is on your `PATH` and is the expected version.
-- Each detected agent has a working hook pointing to `tether hook <agent> pre/post`.
-- The `tether.toml` parses without errors and has no conflicting settings.
+- The aiguard binary is on your `PATH` and is the expected version.
+- Each detected agent has a working hook pointing to `aiguard hook <agent> pre/post`.
+- The `aiguard.toml` parses without errors and has no conflicting settings.
 - The SQLite audit database directory is writable.
 - (Optional) That the ONNX prompt-injection model is present if `tier_model = true` is set.
 
 Example output:
 
 ```
-tether v1.0.0
-  [OK] binary: /usr/local/bin/tether
-  [OK] config: ./tether.toml (schema 1.0)
+aiguard v1.0.0
+  [OK] binary: /usr/local/bin/aiguard
+  [OK] config: ./aiguard.toml (schema 1.0)
   [OK] claude-code: hooks wired in ~/.claude/settings.json
   [OK] codex: hooks wired in ~/.codex/config.toml
   [WARN] gemini: not installed, skipping
-  [OK] audit dir: ~/.local/share/tether/audit (writable)
-  [OK] sqlite: ~/.local/share/tether/tether.db
-  [INFO] ONNX model not present; tier_model is disabled (run: tether models pull pi-detector)
+  [OK] audit dir: ~/.local/share/aiguard/audit (writable)
+  [OK] sqlite: ~/.local/share/aiguard/aiguard.db
+  [INFO] ONNX model not present; tier_model is disabled (run: aiguard models pull pi-detector)
 ```
 
 ## Step 3: Run your agent
 
-Start any supported agent as you normally would. tether's hooks fire automatically before and after each tool call. Blocked calls print a brief explanation to stderr; warnings are logged silently.
+Start any supported agent as you normally would. aiguard's hooks fire automatically before and after each tool call. Blocked calls print a brief explanation to stderr; warnings are logged silently.
 
 ## Step 4: Review the session
 
 After a session, open the replay TUI:
 
 ```sh
-tether replay --last
+aiguard replay --last
 ```
 
 Or replay a specific session by ID:
 
 ```sh
-tether replay abc123def456
+aiguard replay abc123def456
 ```
 
 See [Replay](./replay.md) for the full TUI key bindings and export options.
 
-## Minimal tether.toml
+## Minimal aiguard.toml
 
-The following is the smallest useful configuration. Copy it to your project root as `tether.toml` or let `tether init` generate it for you.
+The following is the smallest useful configuration. Copy it to your project root as `aiguard.toml` or let `aiguard init` generate it for you.
 
 ```toml
 schema = "1.0"
@@ -111,8 +111,8 @@ deny_path_patterns = [
 ]
 
 [logging]
-audit_dir = "~/.local/share/tether/audit"
-sqlite_path = "~/.local/share/tether/tether.db"
+audit_dir = "~/.local/share/aiguard/audit"
+sqlite_path = "~/.local/share/aiguard/aiguard.db"
 retention_days = 90
 ```
 

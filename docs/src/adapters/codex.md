@@ -10,7 +10,7 @@ Hook config file: `~/.codex/config.toml`
 
 ## Install
 
-`tether init` writes the following into your Codex config:
+`aiguard init` writes the following into your Codex config:
 
 ```toml
 # ~/.codex/config.toml
@@ -22,17 +22,17 @@ matcher = ".*"
 timeout = 10
 [[hooks.PreToolUse.hooks]]
 type = "command"
-command = "tether hook codex pre"
+command = "aiguard hook codex pre"
 
 [[hooks.PostToolUse]]
 matcher = ".*"
 timeout = 10
 [[hooks.PostToolUse.hooks]]
 type = "command"
-command = "tether hook codex post"
+command = "aiguard hook codex post"
 ```
 
-## tether.toml entry
+## aiguard.toml entry
 
 ```toml
 [agents.codex]
@@ -49,6 +49,6 @@ Codex tool names: `Bash`, `apply_patch`, `Edit`, `Write`, and `mcp__<server>__<t
 
 ## Known limitations
 
-- `additionalContext` in `PreToolUse` output is **not supported** by Codex (issue #19385). tether does not send `additionalContext` to Codex; warnings are logged to the audit trail only.
+- `additionalContext` in `PreToolUse` output is **not supported** by Codex (issue #19385). aiguard does not send `additionalContext` to Codex; warnings are logged to the audit trail only.
 - `updatedToolOutput` on `PostToolUse` is supported only for MCP tools (not shell tools) in the current Codex release.
 - The `UserPromptSubmit` and `SessionStart` hooks are not available in Codex; only `PreToolUse` and `PostToolUse` fire.

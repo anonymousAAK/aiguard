@@ -1,0 +1,18 @@
+[package]
+name = "aiguard-replay"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Ratatui-based session replay TUI"
+
+[dependencies]
+aiguard-core = { path = "../aiguard-core" }
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+rusqlite = { workspace = true }
+zstd = { workspace = true }

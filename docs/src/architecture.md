@@ -1,16 +1,16 @@
 # Architecture
 
-tether is an 11-crate Rust workspace. This page describes the module topology, the hot-path data flow for a single tool call, and the crate responsibilities.
+aiguard is an 11-crate Rust workspace. This page describes the module topology, the hot-path data flow for a single tool call, and the crate responsibilities.
 
 ## Module topology
 
 ```
                           +------------------------+
-                          |     tether.toml        |
+                          |     aiguard.toml       |
                           +-----------+------------+
                                       |
           +---------------------------v------------------------------+
-          |                  tether-core                            |
+          |                  aiguard-core                           |
           |  +----------+ +----------+ +--------+ +----------+      |
           |  | Policy   | | Scanner  | | Audit  | | Redactor |      |
           |  | Engine   | | Registry | | Log    | |          |      |
@@ -29,17 +29,17 @@ tether is an 11-crate Rust workspace. This page describes the module topology, t
 
 | Crate | Purpose |
 |---|---|
-| `tether-core` | Policy engine, `Scanner` trait, `Decision` algebra, `AuditLog`, `Redactor`, config types |
-| `tether-cli` | `tether` binary — `init`, `doctor`, `replay`, `hook`, `mcp`, `log`, `models` subcommands (clap v4) |
-| `tether-adapter-shellhook` | Shell-hook adapter for Claude Code, Codex CLI, Gemini CLI, Crush, and Cline |
-| `tether-adapter-opencode` | TypeScript plugin shim writer; handles `tether hook opencode <stage>` dispatch |
-| `tether-adapter-aider` | Filesystem watcher (via `notify` crate) and `tether wrap aider` PTY wrapper |
-| `tether-adapter-goose` | Goose config registration and permission shim |
-| `tether-scanner-prompt-injection` | Tier-1 regex (Aho-Corasick), Tier-2 ONNX (`ort`), Tier-3 LLM judge |
-| `tether-scanner-mcp` | Tool-description poisoning scan, SHA-256 tool pinning, rug-pull detection, XORIGIN rules |
-| `tether-scanner-secrets` | Gitleaks-compatible TOML ruleset with Shannon entropy gating |
-| `tether-replay` | Audit log reader and ratatui TUI for session review |
-| `tether-mcp-proxy` | Standalone MCP stdio JSON-RPC proxy (wraps other servers for Aider and Goose) |
+| `aiguard-core` | Policy engine, `Scanner` trait, `Decision` algebra, `AuditLog`, `Redactor`, config types |
+| `aiguard` (cli) | `aiguard` binary — `init`, `doctor`, `replay`, `hook`, `mcp`, `log`, `models` subcommands (clap v4) |
+| `aiguard-adapter-shellhook` | Shell-hook adapter for Claude Code, Codex CLI, Gemini CLI, Crush, and Cline |
+| `aiguard-adapter-opencode` | TypeScript plugin shim writer; handles `aiguard hook opencode <stage>` dispatch |
+| `aiguard-adapter-aider` | Filesystem watcher (via `notify` crate) and `aiguard wrap aider` PTY wrapper |
+| `aiguard-adapter-goose` | Goose config registration and permission shim |
+| `aiguard-scanner-prompt-injection` | Tier-1 regex (Aho-Corasick), Tier-2 ONNX (`ort`), Tier-3 LLM judge |
+| `aiguard-scanner-mcp` | Tool-description poisoning scan, SHA-256 tool pinning, rug-pull detection, XORIGIN rules |
+| `aiguard-scanner-secrets` | Gitleaks-compatible TOML ruleset with Shannon entropy gating |
+| `aiguard-replay` | Audit log reader and ratatui TUI for session review |
+| `aiguard-mcp-proxy` | Standalone MCP stdio JSON-RPC proxy (wraps other servers for Aider and Goose) |
 
 ## Data flow: single tool call (hot path)
 
@@ -50,7 +50,7 @@ Agent decides to call a tool
 PreToolUse hook fires
   |
   v  stdin JSON {session_id, tool_name, tool_input, hook_event_name, ...}
-tether hook <agent> pre  (< 5 ms cold start; policy snapshot mmap'd from disk)
+aiguard hook <agent> pre  (< 5 ms cold start; policy snapshot mmap'd from disk)
   |
   v
 Policy engine evaluates:
@@ -86,9 +86,9 @@ Append AuditEvent to SQLite + append-only JSONL
 ## Config loading precedence
 
 ```
-1. ./tether.toml  (project root; walks up from cwd)
-2. $TETHER_CONFIG  (environment variable override)
-3. ~/.config/tether/tether.toml  (user global)
+1. ./aiguard.toml  (project root; walks up from cwd)
+2. $AIGUARD_CONFIG  (environment variable override)
+3. ~/.config/aiguard/aiguard.toml  (user global)
 4. compiled-in defaults
 ```
 
@@ -96,10 +96,10 @@ Fields in higher-precedence files override lower-precedence ones on a per-field 
 
 ## Key design decisions
 
-**Single static binary.** tether compiles all dependencies — including SQLite via `rusqlite`'s `bundled` feature — into one binary under 15 MB. No system libraries are required. This makes installation trivial and prevents dependency confusion attacks.
+**Single static binary.** aiguard compiles all dependencies — including SQLite via `rusqlite`'s `bundled` feature — into one binary under 15 MB. No system libraries are required. This makes installation trivial and prevents dependency confusion attacks.
 
-**Synchronous hot path.** The `tether hook` entry path is intentionally synchronous. The shell hook must exit in under 10 seconds (Claude Code's hook timeout); tether targets under 5 ms for Tier-1 only and under 100 ms with Tier-2 ONNX enabled. Async is used only for the optional Tier-3 LLM judge and audit log writes (which are fire-and-forget via a background thread).
+**Synchronous hot path.** The `aiguard hook` entry path is intentionally synchronous. The shell hook must exit in under 10 seconds (Claude Code's hook timeout); aiguard targets under 5 ms for Tier-1 only and under 100 ms with Tier-2 ONNX enabled. Async is used only for the optional Tier-3 LLM judge and audit log writes (which are fire-and-forget via a background thread).
 
-**Append-only audit log.** The JSONL audit log is never edited. The SQLite database is the indexed copy used for replay queries; the JSONL is the authoritative record. If the SQLite database is corrupted, it can be rebuilt from the JSONL with `tether log rebuild`.
+**Append-only audit log.** The JSONL audit log is never edited. The SQLite database is the indexed copy used for replay queries; the JSONL is the authoritative record. If the SQLite database is corrupted, it can be rebuilt from the JSONL with `aiguard log rebuild`.
 
-**Adapter strategy.** Claude Code, Codex, Gemini, Crush, and Cline all speak a compatible shell-hook wire format (JSON on stdin, exit code + JSON on stdout). One shared `tether-adapter-shellhook` crate handles all five, with thin per-agent normalization for field name differences and output shape variations. opencode requires a TypeScript plugin shim that calls the Rust binary via `spawnSync`. Aider and Goose, which have no lifecycle hooks, are handled via an MCP proxy that sits in front of all their MCP servers.
+**Adapter strategy.** Claude Code, Codex, Gemini, Crush, and Cline all speak a compatible shell-hook wire format (JSON on stdin, exit code + JSON on stdout). One shared `aiguard-adapter-shellhook` crate handles all five, with thin per-agent normalization for field name differences and output shape variations. opencode requires a TypeScript plugin shim that calls the Rust binary via `spawnSync`. Aider and Goose, which have no lifecycle hooks, are handled via an MCP proxy that sits in front of all their MCP servers.

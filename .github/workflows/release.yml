@@ -104,11 +104,11 @@ jobs:
 
       - name: Build release binary (cross)
         if: matrix.cross == true
-        run: cross build --release --locked --target ${{ matrix.target }} -p tether-cli
+        run: cross build --release --locked --target ${{ matrix.target }} -p aiguard
 
       - name: Build release binary (cargo)
         if: matrix.cross == false
-        run: cargo build --release --locked --target ${{ matrix.target }} -p tether-cli
+        run: cargo build --release --locked --target ${{ matrix.target }} -p aiguard
 
       # ---------------------------------------------------------------------------
       # Package the binary
@@ -119,10 +119,10 @@ jobs:
         run: |
           if [[ "${{ matrix.target }}" == *"-windows-"* ]]; then
             echo "ext=.exe"
-            echo "name=tether.exe"
+            echo "name=aiguard.exe"
           else
             echo "ext="
-            echo "name=tether"
+            echo "name=aiguard"
           fi >> "$GITHUB_OUTPUT"
 
       - name: Create release archive (Unix)
@@ -131,8 +131,8 @@ jobs:
         run: |
           TAG="${GITHUB_REF_NAME}"
           TARGET="${{ matrix.target }}"
-          ARCHIVE="tether-${TAG}-${TARGET}.tar.gz"
-          BIN="target/${TARGET}/release/tether"
+          ARCHIVE="aiguard-${TAG}-${TARGET}.tar.gz"
+          BIN="target/${TARGET}/release/aiguard"
 
           tar -czf "$ARCHIVE" -C "$(dirname "$BIN")" "$(basename "$BIN")"
 
@@ -147,8 +147,8 @@ jobs:
         run: |
           $tag    = "$env:GITHUB_REF_NAME"
           $target = "${{ matrix.target }}"
-          $archive = "tether-$tag-$target.zip"
-          $bin    = "target\$target\release\tether.exe"
+          $archive = "aiguard-$tag-$target.zip"
+          $bin    = "target\$target\release\aiguard.exe"
 
           Compress-Archive -Path $bin -DestinationPath $archive
 
@@ -203,7 +203,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "tether ${{ github.ref_name }}"
+          name: "aiguard ${{ github.ref_name }}"
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true

@@ -1,25 +1,25 @@
-# tether
+# aiguard
 
 > A portable security harness for CLI coding agents. One config, eight agents.
 
 ## Install
 
 ```sh
-cargo install tether-cli
+cargo install aiguard-cli
 ```
 
 Or via the install script:
 
 ```sh
-curl -fsSL https://tether.sh/install | sh
+curl -fsSL https://aiguard.sh/install | sh
 ```
 
 ## Quick start
 
 ```sh
-tether init          # detect agents, write hook configs
-tether doctor        # verify installation
-tether replay --last # review most recent session
+aiguard init          # detect agents, write hook configs
+aiguard doctor        # verify installation
+aiguard replay --last # review most recent session
 ```
 
 ## What it does
@@ -45,8 +45,8 @@ tether replay --last # review most recent session
 
 ## Configuration
 
-tether uses a single `tether.toml` at the project root (or `~/.config/tether/tether.toml` globally).
-Run `tether init` to generate one, or start from the included `tether.toml.example`.
+aiguard uses a single `aiguard.toml` at the project root (or `~/.config/aiguard/aiguard.toml` globally).
+Run `aiguard init` to generate one, or start from the included `aiguard.toml.example`.
 
 Minimal example:
 
@@ -69,7 +69,7 @@ action = "block"
 deny_shell_patterns = ["rm -rf /", "curl * | sh"]
 ```
 
-All fields have sensible defaults. See `tether.toml.example` for the full reference.
+All fields have sensible defaults. See `aiguard.toml.example` for the full reference.
 
 ## Architecture
 
@@ -77,23 +77,23 @@ All fields have sensible defaults. See `tether.toml.example` for the full refere
 
 | Crate | Purpose |
 |---|---|
-| `tether-core` | Policy engine, verdict types, shared traits |
-| `tether-cli` | `tether` binary -- init, doctor, replay subcommands |
-| `tether-adapter-shellhook` | Shell hook adapter for Claude Code, Codex, Gemini, Crush, Cline |
-| `tether-adapter-opencode` | TypeScript plugin shim for opencode |
-| `tether-adapter-aider` | MCP proxy adapter for Aider |
-| `tether-adapter-goose` | MCP proxy adapter for Goose |
-| `tether-scanner-prompt-injection` | Prompt-injection detection engine |
-| `tether-scanner-mcp` | MCP tool-description poisoning and rug-pull scanner |
-| `tether-scanner-secrets` | Secret detection with gitleaks-compatible rules |
-| `tether-replay` | Audit log reader and ratatui TUI |
-| `tether-mcp-proxy` | Standalone MCP proxy server for fallback agents |
+| `aiguard-core` | Policy engine, verdict types, shared traits |
+| `aiguard-cli` | `aiguard` binary -- init, doctor, replay subcommands |
+| `aiguard-adapter-shellhook` | Shell hook adapter for Claude Code, Codex, Gemini, Crush, Cline |
+| `aiguard-adapter-opencode` | TypeScript plugin shim for opencode |
+| `aiguard-adapter-aider` | MCP proxy adapter for Aider |
+| `aiguard-adapter-goose` | MCP proxy adapter for Goose |
+| `aiguard-scanner-prompt-injection` | Prompt-injection detection engine |
+| `aiguard-scanner-mcp` | MCP tool-description poisoning and rug-pull scanner |
+| `aiguard-scanner-secrets` | Secret detection with gitleaks-compatible rules |
+| `aiguard-replay` | Audit log reader and ratatui TUI |
+| `aiguard-mcp-proxy` | Standalone MCP proxy server for fallback agents |
 
 ## Building from source
 
 ```sh
-git clone https://github.com/adarsh/tether.git
-cd tether
+git clone https://github.com/adarsh/aiguard.git
+cd aiguard
 cargo build --release
 ```
 

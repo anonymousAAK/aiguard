@@ -1,0 +1,28 @@
+[package]
+name = "aiguard-scanner-mcp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "MCP server auditing, tool pinning, and rug-pull detection"
+
+[dependencies]
+aiguard-core = { path = "../aiguard-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+regex = { workspace = true }
+directories = { workspace = true }
+tokio = { workspace = true }
+chrono = { workspace = true }
+once_cell = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true }

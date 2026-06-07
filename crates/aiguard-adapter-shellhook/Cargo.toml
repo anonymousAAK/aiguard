@@ -1,0 +1,20 @@
+[package]
+name = "aiguard-adapter-shellhook"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Shell-hook adapter for Claude Code, Codex, Gemini, Crush, and Cline"
+
+[dependencies]
+aiguard-core = { path = "../aiguard-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+tempfile = { workspace = true }

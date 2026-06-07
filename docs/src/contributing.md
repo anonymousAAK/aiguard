@@ -1,11 +1,11 @@
-# Contributing to tether
+# Contributing to aiguard
 
-Thank you for your interest in contributing to tether!
+Thank you for your interest in contributing to aiguard!
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/<you>/tether`
+2. Clone your fork: `git clone https://github.com/<you>/aiguard`
 3. Install Rust (MSRV 1.85): `rustup install 1.85`
 4. Run the test suite: `cargo test --workspace`
 
@@ -35,21 +35,21 @@ cargo insta review
 
 ## Architecture
 
-tether is a Rust workspace with 11 crates:
+aiguard is a Rust workspace with 11 crates:
 
 | Crate | Purpose |
 |---|---|
-| `tether-core` | Policy engine, Scanner trait, audit log, config |
-| `tether-cli` | CLI entry point (clap) |
-| `tether-adapter-shellhook` | Shell-hook adapter for 5 agents |
-| `tether-adapter-opencode` | opencode TS plugin shim |
-| `tether-adapter-aider` | Aider filesystem watcher + config |
-| `tether-adapter-goose` | Goose config registration |
-| `tether-scanner-prompt-injection` | Regex + ONNX prompt-injection detection |
-| `tether-scanner-mcp` | MCP tool-pinning and audit |
-| `tether-scanner-secrets` | Gitleaks-compatible secret detection |
-| `tether-replay` | Ratatui session replay TUI |
-| `tether-mcp-proxy` | MCP stdio JSON-RPC proxy |
+| `aiguard-core` | Policy engine, Scanner trait, audit log, config |
+| `aiguard` (cli) | CLI entry point (clap) |
+| `aiguard-adapter-shellhook` | Shell-hook adapter for 5 agents |
+| `aiguard-adapter-opencode` | opencode TS plugin shim |
+| `aiguard-adapter-aider` | Aider filesystem watcher + config |
+| `aiguard-adapter-goose` | Goose config registration |
+| `aiguard-scanner-prompt-injection` | Regex + ONNX prompt-injection detection |
+| `aiguard-scanner-mcp` | MCP tool-pinning and audit |
+| `aiguard-scanner-secrets` | Gitleaks-compatible secret detection |
+| `aiguard-replay` | Ratatui session replay TUI |
+| `aiguard-mcp-proxy` | MCP stdio JSON-RPC proxy |
 
 ## Code of Conduct
 

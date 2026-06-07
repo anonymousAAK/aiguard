@@ -1,17 +1,17 @@
 [workspace]
 resolver = "2"
 members = [
-  "crates/tether-core",
-  "crates/tether-cli",
-  "crates/tether-adapter-shellhook",
-  "crates/tether-adapter-opencode",
-  "crates/tether-adapter-aider",
-  "crates/tether-adapter-goose",
-  "crates/tether-scanner-prompt-injection",
-  "crates/tether-scanner-mcp",
-  "crates/tether-scanner-secrets",
-  "crates/tether-replay",
-  "crates/tether-mcp-proxy",
+  "crates/aiguard-core",
+  "crates/aiguard-cli",
+  "crates/aiguard-adapter-shellhook",
+  "crates/aiguard-adapter-opencode",
+  "crates/aiguard-adapter-aider",
+  "crates/aiguard-adapter-goose",
+  "crates/aiguard-scanner-prompt-injection",
+  "crates/aiguard-scanner-mcp",
+  "crates/aiguard-scanner-secrets",
+  "crates/aiguard-replay",
+  "crates/aiguard-mcp-proxy",
 ]
 
 [workspace.package]
@@ -20,7 +20,7 @@ edition = "2021"
 rust-version = "1.85"
 authors = ["Adarsh"]
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/aiguard-dev/aiguard"
+repository = "https://github.com/anonymousAAK/aiguard"
 
 [workspace.dependencies]
 # CLI

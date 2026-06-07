@@ -1,6 +1,6 @@
 # Cookbook
 
-Ten ready-to-use recipes for common tether configurations.
+Ten ready-to-use recipes for common aiguard configurations.
 
 ---
 
@@ -105,23 +105,23 @@ audit_on_add = true
 require_pinning = true
 ```
 
-When strict mode is on and an MCP server's `tools/list` contains a Tier-1 injection pattern, tether refuses to start the session. Run `tether mcp scan` before starting your agent to get a full pre-flight report.
+When strict mode is on and an MCP server's `tools/list` contains a Tier-1 injection pattern, aiguard refuses to start the session. Run `aiguard mcp scan` before starting your agent to get a full pre-flight report.
 
 ---
 
-## 5. Per-project tether.toml
+## 5. Per-project aiguard.toml
 
-Keep a project-specific config in the repository root alongside your code. tether searches upward from the current working directory and uses the first `tether.toml` it finds.
+Keep a project-specific config in the repository root alongside your code. aiguard searches upward from the current working directory and uses the first `aiguard.toml` it finds.
 
 ```
 my-project/
-  tether.toml        <-- project config (checked into git)
+  aiguard.toml        <-- project config (checked into git)
   src/
   tests/
 ```
 
 ```toml
-# my-project/tether.toml
+# my-project/aiguard.toml
 schema = "1.0"
 
 [policy]
@@ -142,16 +142,16 @@ allow_path_patterns = [
 ]
 ```
 
-The global config at `~/.config/tether/tether.toml` is used as fallback for any field not specified in the project config.
+The global config at `~/.config/aiguard/aiguard.toml` is used as fallback for any field not specified in the project config.
 
 ---
 
 ## 6. Enable strict mode for CI
 
-In CI, block on any scanner warning and fail-closed on tether errors:
+In CI, block on any scanner warning and fail-closed on aiguard errors:
 
 ```toml
-# ci-tether.toml (or set TETHER_CONFIG=ci-tether.toml in CI)
+# ci-aiguard.toml (or set AIGUARD_CONFIG=ci-aiguard.toml in CI)
 schema = "1.0"
 
 [policy]
@@ -179,7 +179,7 @@ Set the config path in your CI environment:
 
 ```yaml
 env:
-  TETHER_CONFIG: ./ci-tether.toml
+  AIGUARD_CONFIG: ./ci-aiguard.toml
 ```
 
 ---
@@ -189,19 +189,19 @@ env:
 Export all sessions from today to a file:
 
 ```sh
-tether log export --since today > audit-$(date +%Y-%m-%d).jsonl
+aiguard log export --since today > audit-$(date +%Y-%m-%d).jsonl
 ```
 
 Export all blocked events across all time:
 
 ```sh
-tether log export --decision block > blocked-events.jsonl
+aiguard log export --decision block > blocked-events.jsonl
 ```
 
 Filter with jq to find all events involving a specific tool:
 
 ```sh
-tether log export --since 7d | jq 'select(.tool_name == "Bash")'
+aiguard log export --since 7d | jq 'select(.tool_name == "Bash")'
 ```
 
 The JSONL schema mirrors the SQLite `events` table: each line is a JSON object with fields `ts`, `session_id`, `agent`, `stage`, `tool_name`, `decision`, `scanners`, `duration_us`, and `input_hash`.
@@ -213,7 +213,7 @@ The JSONL schema mirrors the SQLite `events` table: each line is a JSON object w
 List recent sessions:
 
 ```sh
-tether log sessions --last 10
+aiguard log sessions --last 10
 ```
 
 Example output:
@@ -227,23 +227,23 @@ abc123def456        claude-code  2026-05-23 14:02:01   47      2
 Open a session in the replay TUI:
 
 ```sh
-tether replay abc123def456
+aiguard replay abc123def456
 ```
 
 Export a session without opening the TUI:
 
 ```sh
-tether replay abc123def456 --export | jq .
+aiguard replay abc123def456 --export | jq .
 ```
 
 ---
 
 ## 9. Add custom secret detection rules
 
-Drop a custom rules file into `~/.config/tether/secrets-extra.toml`:
+Drop a custom rules file into `~/.config/aiguard/secrets-extra.toml`:
 
 ```toml
-# ~/.config/tether/secrets-extra.toml
+# ~/.config/aiguard/secrets-extra.toml
 
 [[rule]]
 id = "corp-api-key"
@@ -258,25 +258,25 @@ regex = "(?i)jwt[_-]?secret['\"]?\s*[:=]\s*['\"]?([A-Za-z0-9+/]{32,})['\"]?"
 entropy = 4.0
 ```
 
-Reference it in `tether.toml`:
+Reference it in `aiguard.toml`:
 
 ```toml
 [scanners.secrets]
-extra_patterns = ["~/.config/tether/secrets-extra.toml"]
+extra_patterns = ["~/.config/aiguard/secrets-extra.toml"]
 ```
 
 The extra rules are merged with the built-in ruleset and subject to the same `action` and `entropy_threshold` settings.
 
 ---
 
-## 10. Use tether with multiple agents simultaneously
+## 10. Use aiguard with multiple agents simultaneously
 
-tether is designed for this. Each agent has its own hook config that points to `tether hook <agent> pre/post`, and all agents share the same `tether.toml` and audit log.
+aiguard is designed for this. Each agent has its own hook config that points to `aiguard hook <agent> pre/post`, and all agents share the same `aiguard.toml` and audit log.
 
-After running `tether init`, you can verify all hooks are in place:
+After running `aiguard init`, you can verify all hooks are in place:
 
 ```sh
-tether doctor
+aiguard doctor
 ```
 
 To enable all agents and set per-agent overrides:
@@ -317,4 +317,4 @@ default_action = "block"
 extra_deny_shell_patterns = ["git push --force*"]
 ```
 
-All sessions from all agents appear in the same audit log and are navigable with `tether replay`.
+All sessions from all agents appear in the same audit log and are navigable with `aiguard replay`.

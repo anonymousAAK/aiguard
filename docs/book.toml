@@ -1,14 +1,14 @@
 [book]
-authors = ["tether contributors"]
+authors = ["aiguard contributors"]
 language = "en"
 multilingual = false
 src = "src"
-title = "tether"
+title = "aiguard"
 description = "Security harness for CLI coding agents"
 
 [output.html]
 default-theme = "dark"
 preferred-dark-theme = "ayu"
-git-repository-url = "https://github.com/tether-dev/tether"
-edit-url-template = "https://github.com/tether-dev/tether/edit/main/docs/src/{path}"
+git-repository-url = "https://github.com/aiguard-dev/aiguard"
+edit-url-template = "https://github.com/aiguard-dev/aiguard/edit/main/docs/src/{path}"
 site-url = "/docs/"

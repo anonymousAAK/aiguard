@@ -1,8 +1,8 @@
 # Cline
 
-Cline (the VS Code extension) supports two hook mechanisms. tether prefers the Claude-spec hook path merged in Cline PR #6440, which provides 100% compatibility with the Claude Code hook protocol. For older Cline versions, tether falls back to the v3.36+ shell-hook path.
+Cline (the VS Code extension) supports two hook mechanisms. aiguard prefers the Claude-spec hook path merged in Cline PR #6440, which provides 100% compatibility with the Claude Code hook protocol. For older Cline versions, aiguard falls back to the v3.36+ shell-hook path.
 
-`tether doctor` detects the installed Cline version and installs the appropriate hook config.
+`aiguard doctor` detects the installed Cline version and installs the appropriate hook config.
 
 ## Hook type
 
@@ -14,16 +14,16 @@ macOS and Linux only. The v3.36 shell hook path is not available on Windows; on 
 
 ## Install
 
-`tether init` writes the hook config at:
+`aiguard init` writes the hook config at:
 
 ```
-~/Documents/Cline/Rules/Hooks/tether-pre.sh
-~/Documents/Cline/Rules/Hooks/tether-post.sh
+~/Documents/Cline/Rules/Hooks/aiguard-pre.sh
+~/Documents/Cline/Rules/Hooks/aiguard-post.sh
 ```
 
-The hook scripts call `tether hook cline pre` and `tether hook cline post` respectively.
+The hook scripts call `aiguard hook cline pre` and `aiguard hook cline post` respectively.
 
-For the Claude-spec path (PR #6440+), `tether init` also writes:
+For the Claude-spec path (PR #6440+), `aiguard init` also writes:
 
 ```json
 {
@@ -31,20 +31,20 @@ For the Claude-spec path (PR #6440+), `tether init` also writes:
     "PreToolUse": [
       {
         "matcher": "*",
-        "hooks": [{ "type": "command", "command": "tether hook cline pre" }]
+        "hooks": [{ "type": "command", "command": "aiguard hook cline pre" }]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "*",
-        "hooks": [{ "type": "command", "command": "tether hook cline post" }]
+        "hooks": [{ "type": "command", "command": "aiguard hook cline post" }]
       }
     ]
   }
 }
 ```
 
-## tether.toml entry
+## aiguard.toml entry
 
 ```toml
 [agents.cline]
@@ -57,7 +57,7 @@ default_action = "warn"
 
 ## Tool names
 
-Cline maps its internal tool names to Claude Code names via `ToolNameMapper` (PR #6440). When using the Claude-spec hook path, tool names visible to tether are the canonical Claude Code names (`Bash`, `Write`, `Edit`, etc.).
+Cline maps its internal tool names to Claude Code names via `ToolNameMapper` (PR #6440). When using the Claude-spec hook path, tool names visible to aiguard are the canonical Claude Code names (`Bash`, `Write`, `Edit`, etc.).
 
 ## Known limitations
 
