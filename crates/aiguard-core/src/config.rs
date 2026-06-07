@@ -43,11 +43,21 @@ pub fn load_policy_from(cwd: Option<PathBuf>) -> Result<Policy> {
         }
     }
 
-    // Layer 3: $AIGUARD_CONFIG env var
+    // Layer 3: $AIGUARD_CONFIG env var — validated to .toml extension only.
     if let Ok(env_path) = std::env::var(CONFIG_ENV_VAR) {
         let p = PathBuf::from(&env_path);
-        if p.is_file() {
+        let ext_ok = p.extension().map_or(false, |e| e.eq_ignore_ascii_case("toml"));
+        if !ext_ok {
+            tracing::warn!(
+                path = %p.display(),
+                "AIGUARD_CONFIG path does not end in .toml — ignoring to prevent \
+                 accidental loading of unintended file types"
+            );
+        } else if p.is_file() {
+            tracing::info!(path = %p.display(), "loading config from AIGUARD_CONFIG");
             figment = figment.merge(Toml::file(&p));
+        } else {
+            tracing::warn!(path = %p.display(), "AIGUARD_CONFIG points to a non-existent file");
         }
     }
 

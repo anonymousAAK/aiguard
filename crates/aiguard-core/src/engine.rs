@@ -206,20 +206,37 @@ impl PolicyEngine {
     ) -> Result<()> {
         let scanner_map: serde_json::Value = verdicts
             .iter()
-            .map(|(name, v)| (name.clone(), serde_json::to_value(v).unwrap_or_default()))
-            .collect::<serde_json::Map<String, serde_json::Value>>()
+            .map(|(name, v)| {
+                serde_json::to_value(v)
+                    .map(|val| (name.clone(), val))
+                    .map_err(AiguardError::from)
+            })
+            .collect::<Result<serde_json::Map<String, serde_json::Value>>>()?
             .into();
 
         // Build the payload from the tool input, redacting secrets.
+        // Serialization failures here are non-fatal: we log and continue with empty payload.
         let payload = ctx.tool_input.map(|input| {
-            let raw = serde_json::to_string(input).unwrap_or_default();
-            let (redacted, _) = self.redactor.redact(&raw);
-            redacted.into_bytes()
+            match serde_json::to_string(input) {
+                Ok(raw) => {
+                    let (redacted, _) = self.redactor.redact(&raw);
+                    redacted.into_bytes()
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "failed to serialize tool_input for audit payload");
+                    Vec::new()
+                }
+            }
         });
 
         let input_bytes = ctx
             .tool_input
-            .map(|v| serde_json::to_vec(v).unwrap_or_default())
+            .map(|v| {
+                serde_json::to_vec(v).unwrap_or_else(|e| {
+                    tracing::warn!(error = %e, "failed to serialize tool_input for input hash");
+                    Vec::new()
+                })
+            })
             .unwrap_or_default();
 
         let event = AuditEvent {

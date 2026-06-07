@@ -18,8 +18,15 @@ impl ModelTierScanner {
             return Ok(ScanVerdict::Pass);
         }
 
-        // ONNX integration placeholder - when enabled, would run inference
-        // against a fine-tuned transformer model for prompt injection detection.
+        // ONNX runtime not compiled in for this build (v0.x stub).
+        // Run `aiguard models pull pi-v2` to download the model, then recompile
+        // with the `onnx` feature once the runtime is wired up in a future release.
+        // Until then, this tier is inert — Tier-1 regex scanning still runs.
+        tracing::warn!(
+            "prompt-injection model tier is enabled but the ONNX runtime is not \
+             compiled in (v0.x stub). Falling back to Pass. Set `tier_model = false` \
+             in [scanners.prompt_injection] to suppress this warning."
+        );
         Ok(ScanVerdict::Pass)
     }
 }

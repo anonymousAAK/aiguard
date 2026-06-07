@@ -18,6 +18,7 @@ mod cmd_mcp;
 mod cmd_models;
 mod cmd_replay;
 mod cmd_wrap;
+mod util;
 
 use clap::{Parser, Subcommand};
 

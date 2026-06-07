@@ -29,8 +29,8 @@ impl Normalizer for ClineNormalizer {
             .get("sessionId")
             .or_else(|| raw.get("session_id"))
             .and_then(|v| v.as_str())
-            .unwrap_or("unknown")
-            .to_string();
+            .map(String::from)
+            .unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
 
         let tool_name = raw
             .get("toolName")

@@ -68,7 +68,7 @@ enum LogCommand {
 }
 
 pub async fn run(args: LogArgs) -> Result<()> {
-    let db_path = resolve_db_path();
+    let db_path = crate::util::resolve_db_path();
 
     match args.command {
         LogCommand::Tail { count, filter } => cmd_tail(&db_path, count, filter),
@@ -231,14 +231,3 @@ fn cmd_export(db_path: &str, output: Option<String>, session: Option<String>) ->
     Ok(())
 }
 
-/// Resolve the path to the SQLite audit database.
-fn resolve_db_path() -> String {
-    if let Some(dirs) = directories::ProjectDirs::from("", "", "aiguard") {
-        dirs.data_dir()
-            .join("audit.db")
-            .to_string_lossy()
-            .to_string()
-    } else {
-        "~/.local/share/aiguard/audit.db".to_string()
-    }
-}

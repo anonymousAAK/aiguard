@@ -55,6 +55,8 @@ pub async fn run() -> Result<()> {
             "gemini hook",
             check_agent_hook("gemini", ".gemini/settings.json"),
         ),
+        ("crush hook", check_crush_hook()),
+        ("cline hook", check_cline_hook()),
     ];
 
     let mut ok_count = 0;
@@ -204,6 +206,73 @@ fn check_agent_hook(agent_name: &str, config_rel_path: &str) -> CheckStatus {
             }
         }
         Err(e) => CheckStatus::Fail(format!("cannot read {}: {}", config_path.display(), e)),
+    }
+}
+
+/// Check crush hook: project-local crush.json
+fn check_crush_hook() -> CheckStatus {
+    let config_path = std::path::PathBuf::from("crush.json");
+    if !config_path.exists() {
+        if which::which("crush").is_err() {
+            return CheckStatus::Ok("crush not installed (skipped)".to_string());
+        }
+        return CheckStatus::Warn(
+            "crush.json not found in current directory. Run `aiguard init`.".to_string(),
+        );
+    }
+    match fs::read_to_string(&config_path) {
+        Ok(content) => {
+            if content.contains("aiguard") {
+                CheckStatus::Ok("configured in ./crush.json".to_string())
+            } else {
+                CheckStatus::Warn("crush.json exists but does not reference aiguard".to_string())
+            }
+        }
+        Err(e) => CheckStatus::Fail(format!("cannot read crush.json: {e}")),
+    }
+}
+
+/// Check cline hook: .clinerules/hooks/aiguard.sh or ~/Documents/Cline/Rules/Hooks/
+fn check_cline_hook() -> CheckStatus {
+    let local_hook = std::path::PathBuf::from(".clinerules/hooks/aiguard.sh");
+    let global_hook = home_dir().map(|h| {
+        h.join("Documents")
+            .join("Cline")
+            .join("Rules")
+            .join("Hooks")
+            .join("aiguard.sh")
+    });
+
+    let hook_path = if local_hook.exists() {
+        Some(local_hook)
+    } else {
+        global_hook.filter(|p| p.exists())
+    };
+
+    match hook_path {
+        Some(path) => {
+            match fs::read_to_string(&path) {
+                Ok(content) if content.contains("aiguard") => {
+                    CheckStatus::Ok(format!("configured at {}", path.display()))
+                }
+                Ok(_) => CheckStatus::Warn(format!(
+                    "hook script exists but does not reference aiguard: {}",
+                    path.display()
+                )),
+                Err(e) => CheckStatus::Fail(format!("cannot read {}: {e}", path.display())),
+            }
+        }
+        None => {
+            let cline_installed = which::which("cline").is_ok()
+                || home_dir()
+                    .map(|h| h.join("Documents").join("Cline").exists())
+                    .unwrap_or(false);
+            if cline_installed {
+                CheckStatus::Warn("Cline hook not found. Run `aiguard init`.".to_string())
+            } else {
+                CheckStatus::Ok("Cline not installed (skipped)".to_string())
+            }
+        }
     }
 }
 

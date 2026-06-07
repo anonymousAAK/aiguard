@@ -38,12 +38,6 @@ pub async fn handle_hook(
         "parsed hook event"
     );
 
-    // For Crush PostToolUse, always allow (Crush doesn't support post-tool hooks).
-    if agent == "crush" && event.event_type == HookEventType::PostToolUse {
-        let response = HookResponse::Allow;
-        return Ok(normalizer.format_response(&response));
-    }
-
     // Map event type to aiguard_core::Stage
     let core_stage = map_stage(&event.event_type, stage)?;
 
@@ -119,10 +113,14 @@ fn decision_to_response(
             },
         },
         aiguard_core::Decision::Ask => {
-            // Ask is treated as a block with a special message indicating
-            // the user should be prompted.
+            // Interactive approval not yet wired — downgrade to Block so the
+            // action is stopped rather than silently allowed.
+            tracing::warn!(
+                "Decision::Ask has no interactive flow in this version; blocking the action. \
+                 Interactive approval will be added in a future release."
+            );
             HookResponse::Block {
-                message: "policy requires manual approval".to_string(),
+                message: "policy requires manual approval (blocking until interactive mode is available)".to_string(),
             }
         }
     }

@@ -150,11 +150,11 @@ fn configure_claude_code(aiguard_bin: &str, force: bool) -> Result<()> {
         "hooks": {
             "PreToolUse": [{
                 "type": "command",
-                "command": format!("{aiguard_bin} hook claude-code pre_tool")
+                "command": format!("\"{}\" hook claude-code pre_tool", aiguard_bin)
             }],
             "PostToolUse": [{
                 "type": "command",
-                "command": format!("{aiguard_bin} hook claude-code post_tool")
+                "command": format!("\"{}\" hook claude-code post_tool", aiguard_bin)
             }]
         }
     });
@@ -170,9 +170,10 @@ fn configure_codex(aiguard_bin: &str, force: bool) -> Result<()> {
     let hook_content = format!(
         r#"
 [hooks]
-pre_tool = "{aiguard_bin} hook codex pre_tool"
-post_tool = "{aiguard_bin} hook codex post_tool"
-"#
+pre_tool = "\"{}\" hook codex pre_tool"
+post_tool = "\"{}\" hook codex post_tool"
+"#,
+        aiguard_bin, aiguard_bin
     );
 
     write_toml_config(&config_path, &hook_content, force)
@@ -185,8 +186,8 @@ fn configure_gemini(aiguard_bin: &str, force: bool) -> Result<()> {
 
     let hook_config = serde_json::json!({
         "hooks": {
-            "pre_tool": format!("{aiguard_bin} hook gemini pre_tool"),
-            "post_tool": format!("{aiguard_bin} hook gemini post_tool")
+            "pre_tool": format!("\"{}\" hook gemini pre_tool", aiguard_bin),
+            "post_tool": format!("\"{}\" hook gemini post_tool", aiguard_bin)
         }
     });
 
@@ -199,8 +200,8 @@ fn configure_crush(aiguard_bin: &str, force: bool) -> Result<()> {
 
     let hook_config = serde_json::json!({
         "hooks": {
-            "pre_tool": format!("{aiguard_bin} hook crush pre_tool"),
-            "post_tool": format!("{aiguard_bin} hook crush post_tool")
+            "pre_tool": format!("\"{}\" hook crush pre_tool", aiguard_bin),
+            "post_tool": format!("\"{}\" hook crush post_tool", aiguard_bin)
         }
     });
 
@@ -224,11 +225,8 @@ fn configure_cline(aiguard_bin: &str, force: bool) -> Result<()> {
     fs::create_dir_all(&hooks_dir)?;
 
     let hook_script = format!(
-        r#"#!/bin/sh
-# aiguard hook for Cline
-# This script is called by Cline before and after tool execution.
-exec {aiguard_bin} hook cline "$@"
-"#
+        "#!/bin/sh\n# aiguard hook for Cline\n# This script is called by Cline before and after tool execution.\nexec \"{}\" hook cline \"$@\"\n",
+        aiguard_bin
     );
 
     let hook_path = hooks_dir.join("aiguard.sh");
@@ -261,7 +259,7 @@ export default {{
   hooks: {{
     preTool(ctx: any) {{
       const input = JSON.stringify(ctx);
-      const result = execSync(`echo '${{input}}' | {aiguard_bin} hook opencode pre_tool`, {{
+      const result = execSync(`echo '${{input}}' | "{aiguard_bin}" hook opencode pre_tool`, {{
         encoding: "utf-8",
         timeout: 5000,
       }});
@@ -269,7 +267,7 @@ export default {{
     }},
     postTool(ctx: any) {{
       const input = JSON.stringify(ctx);
-      const result = execSync(`echo '${{input}}' | {aiguard_bin} hook opencode post_tool`, {{
+      const result = execSync(`echo '${{input}}' | "{aiguard_bin}" hook opencode post_tool`, {{
         encoding: "utf-8",
         timeout: 5000,
       }});

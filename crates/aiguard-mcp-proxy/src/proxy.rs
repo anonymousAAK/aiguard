@@ -204,6 +204,15 @@ impl McpProxy {
     /// their connection.
     pub async fn run_stdio(&self) -> Result<()> {
         // -----------------------------------------------------------------
+        // 0. Safety notice
+        // -----------------------------------------------------------------
+        warn!(
+            command = %self.upstream_command,
+            args = ?self.upstream_args,
+            "spawning MCP server from config — ensure this command is trusted before use"
+        );
+
+        // -----------------------------------------------------------------
         // 1. Spawn upstream MCP server
         // -----------------------------------------------------------------
         let mut child = Command::new(&self.upstream_command)

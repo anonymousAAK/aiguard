@@ -17,20 +17,20 @@ fn arb_pass() -> impl Strategy<Value = ScanVerdict> {
 }
 
 fn arb_warn() -> impl Strategy<Value = ScanVerdict> {
-    ("[a-z ]{1,30}", 0.0f32..1.0f32)
-        .prop_map(|(message, score)| ScanVerdict::Warn {
+    ("[a-z ]{1,30}", 0.0f32..1.0f32, prop::collection::vec(arb_hit(), 0..3))
+        .prop_map(|(message, score, hits)| ScanVerdict::Warn {
             message,
             score,
-            hits: vec![],
+            hits,
         })
 }
 
 fn arb_block() -> impl Strategy<Value = ScanVerdict> {
-    ("[a-z ]{1,30}", 0.0f32..1.0f32)
-        .prop_map(|(message, score)| ScanVerdict::Block {
+    ("[a-z ]{1,30}", 0.0f32..1.0f32, prop::collection::vec(arb_hit(), 0..3))
+        .prop_map(|(message, score, hits)| ScanVerdict::Block {
             message,
             score,
-            hits: vec![],
+            hits,
         })
 }
 

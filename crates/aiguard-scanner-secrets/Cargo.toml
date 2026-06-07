@@ -20,5 +20,4 @@ aho-corasick = { workspace = true }
 once_cell = { workspace = true }
 
 [dev-dependencies]
-insta = { workspace = true }
 tokio = { workspace = true }

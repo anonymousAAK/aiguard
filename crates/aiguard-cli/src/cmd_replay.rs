@@ -16,7 +16,7 @@ pub struct ReplayArgs {
 }
 
 pub fn run(args: ReplayArgs) -> Result<()> {
-    let db_path = resolve_db_path();
+    let db_path = crate::util::resolve_db_path();
 
     if args.last {
         return aiguard_replay::run_replay_last(&db_path);
@@ -54,14 +54,3 @@ pub fn run(args: ReplayArgs) -> Result<()> {
     }
 }
 
-/// Resolve the path to the SQLite audit database.
-fn resolve_db_path() -> String {
-    if let Some(dirs) = directories::ProjectDirs::from("", "", "aiguard") {
-        dirs.data_dir()
-            .join("audit.db")
-            .to_string_lossy()
-            .to_string()
-    } else {
-        "~/.local/share/aiguard/audit.db".to_string()
-    }
-}
