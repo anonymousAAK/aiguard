@@ -1,4 +1,4 @@
-# Explicit MSVC linker path — avoids /usr/bin/link (MSYS2 ln) shadowing link.exe
-# when cargo is invoked from Git bash / MSYS2.
-[target.x86_64-pc-windows-msvc]
-linker = "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+# No hardcoded linker path — let Rust auto-detect MSVC from the registry.
+# On local MSYS2/Git Bash where /usr/bin/link shadows link.exe, run cargo
+# from a VS Developer Command Prompt or set:
+#   set CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=link.exe
